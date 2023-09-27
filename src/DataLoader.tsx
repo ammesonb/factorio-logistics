@@ -48,7 +48,7 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
             );
           } else {
             // Some names have colors in them, it seems - fluids in particular
-            db.items.bulkAdd(
+            db.items.bulkPut(
               Object.entries(newItems["names"]).map(
                 ([internalName, display]) => ({
                   internalName,
@@ -139,7 +139,18 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
         </Row>
 
         <Row style={{ marginTop: "1%" }}>
-          <Col md={6} mdOffset={9} style={{ textAlign: "center" }}>
+          <Col md={3} mdOffset={9} style={{ textAlign: "center" }}>
+            <Button
+              appearance="primary"
+              color="red"
+              size="lg"
+              onClick={() => db.items.clear()}
+              disabled={items.length === 0}
+            >
+              Clear Items
+            </Button>
+          </Col>
+          <Col md={3} style={{ textAlign: "center" }}>
             <Whisper
               placement="right"
               trigger="hover"
@@ -174,7 +185,11 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
               trigger="hover"
               speaker={<Tooltip>{item.internalName}</Tooltip>}
             >
-              <Tag color={item.icon === "" ? "red" : "green"}>
+              <Tag
+                color={item.icon === "" ? "red" : "green"}
+                closable
+                onClose={() => db.items.delete(item.internalName)}
+              >
                 {item.icon.length > 0 && <img height={32} src={item.icon} />}
                 {item.name}
               </Tag>

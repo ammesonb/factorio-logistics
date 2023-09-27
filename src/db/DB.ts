@@ -1,5 +1,4 @@
 import Dexie, { Table } from "dexie";
-import { useLiveQuery } from "dexie-react-hooks";
 
 const DB_NAME = "FactorioLogistics";
 
@@ -102,7 +101,3 @@ export const DB_CONFIG = {
   ],
 }
 */
-
-export const hasData = (): boolean => {
-  return useLiveQuery(() => db.items.toArray(), [], []).length > 0;
-};
