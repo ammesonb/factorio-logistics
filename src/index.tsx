@@ -10,7 +10,7 @@ const App = React.lazy(() => import(/* webpackChunkName: "app" */ "./App"));
 const root = document.getElementById("root") as Element;
 createRoot(root).render(
   <React.Suspense
-    fallback={<Loader center size="lg" vertical content="Loading..." />}
+    fallback={<Loader center size="lg" inverse vertical content="Loading..." />}
   >
     <CustomProvider theme="dark">
       <App />

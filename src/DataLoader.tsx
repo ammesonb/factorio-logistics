@@ -6,6 +6,7 @@ import {
   Col,
   Container,
   Grid,
+  Loader,
   Message,
   Panel,
   Row,
@@ -21,15 +22,15 @@ import { db, Item } from "./db/DB";
 
 export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
   const [error, setError] = useState("");
-  const items = useLiveQuery(() => db.items.toArray(), [], []);
+  const items = useLiveQuery(() => db.items.toArray(), [], null);
   const allIconsPresent = useMemo(
-    () => items.filter((item: Item) => item.icon.length === 0).length === 0,
+    () => items?.filter((item: Item) => item.icon.length === 0).length === 0,
     [items],
   );
 
   const helpText = useMemo(
     () =>
-      items.length === 0
+      items?.length === 0
         ? "Please add items"
         : allIconsPresent
         ? ""
@@ -145,7 +146,7 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
               color="red"
               size="lg"
               onClick={() => db.items.clear()}
-              disabled={items.length === 0}
+              disabled={items?.length === 0}
             >
               Clear Items
             </Button>
@@ -159,7 +160,7 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
               <Button
                 appearance="primary"
                 color={
-                  items.length > 0
+                  (items?.length || 0) > 0
                     ? allIconsPresent
                       ? "green"
                       : "yellow"
@@ -167,7 +168,7 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
                 }
                 size="lg"
                 onClick={setLoaded}
-                disabled={items.length === 0}
+                disabled={items?.length === 0}
               >
                 Done
               </Button>
@@ -177,8 +178,9 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
       </Grid>
       <br />
       <Panel header={<h3>Loaded items</h3>}>
+        {items === null && <Loader size="lg" inverse />}
         <TagGroup>
-          {items.map((item) => (
+          {items?.map((item) => (
             <Whisper
               key={item.internalName}
               placement="top"
