@@ -48,8 +48,8 @@
   "scripts": {
     "build": "webpack --config webpack.production.js",
     "start": "webpack serve --config webpack.development.js",
-    "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,md}\" && prettier --write \"*.{js,jsx,ts,tsx,json,md}\" && prettier --write \".eslintrc\"",
+    "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,md}\" \"*.{js,jsx,ts,tsx,json,md}\" \".eslintrc\"",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
-    "check-format": "prettier -c \"./src/**/*.{js,jsx,ts,tsx,json,md}\" && prettier -c \"*.{js,jsx,ts,tsx,json,md}\" && prettier -c \".eslintrc\""
+    "check-format": "prettier -c \"./src/**/*.{js,jsx,ts,tsx,json,md}\" \"*.{js,jsx,ts,tsx,json,md}\" \".eslintrc\""
   }
 }
