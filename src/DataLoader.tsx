@@ -9,6 +9,7 @@ import {
   Message,
   Panel,
   Row,
+  Stack,
   Tag,
   TagGroup,
   Tooltip,
@@ -37,29 +38,45 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
   );
 
   const addItems = useMemo(
-    () => (file: FileType) => {
-      file.blobFile?.text().then((data: string) => {
-        const newItems = JSON.parse(data);
-        if (!Object.keys(newItems).includes("names")) {
-          setError(
-            "Uploaded item locale file did not include `names` property",
-          );
-        } else {
-          // Some names have colors in them, it seems - fluids in particular
-          db.items.bulkAdd(
-            Object.entries(newItems["names"]).map(
-              ([internalName, display]) => ({
-                internalName,
-                name: (display as string).split("[color")[0],
-                icon: "",
-              }),
-            ),
-          );
-        }
-      });
+    () =>
+      (file: FileType): boolean => {
+        file.blobFile?.text().then((data: string) => {
+          const newItems = JSON.parse(data);
+          if (!Object.keys(newItems).includes("names")) {
+            setError(
+              "Uploaded item locale file did not include `names` property",
+            );
+          } else {
+            // Some names have colors in them, it seems - fluids in particular
+            db.items.bulkAdd(
+              Object.entries(newItems["names"]).map(
+                ([internalName, display]) => ({
+                  internalName,
+                  name: (display as string).split("[color")[0],
+                  icon: "",
+                }),
+              ),
+            );
+          }
+        });
 
-      return false;
-    },
+        return false;
+      },
+    [setError],
+  );
+
+  const addIcons = useMemo(
+    () =>
+      (file: FileType): boolean => {
+        const r = new FileReader();
+        r.onloadend = () =>
+          db.items.update((file.name as string).replace(".png", ""), {
+            icon: r.result,
+          });
+        r.readAsDataURL(file.blobFile as File);
+
+        return false;
+      },
     [setError],
   );
 
@@ -79,7 +96,7 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
 1. You will need to generate some sources from Factorio for this tool to work.
     - Reference their [command line parameters](https://wiki.factorio.com/Command_line_parameters) page as needed
 2. Upload the outputted item JSON using the button below
-3. Upload icons from the Factorio output
+3. Upload icons from the Factorio output (supports multi-select)
 
 ### Generating Factorio sources
 1. Locate your factorio executable and run the following commands
@@ -93,16 +110,29 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
               `}</ReactMarkdown>
 
                 <br />
-                <Uploader
-                  accept="application/json"
-                  action=""
-                  fileListVisible={false}
-                  shouldUpload={addItems}
-                >
-                  <Button appearance="primary" color="blue">
-                    Upload Items
-                  </Button>
-                </Uploader>
+                <Stack direction="row" spacing={12}>
+                  <Uploader
+                    accept="application/json"
+                    action=""
+                    fileListVisible={false}
+                    shouldUpload={addItems}
+                  >
+                    <Button appearance="primary" color="blue">
+                      Upload Items
+                    </Button>
+                  </Uploader>
+                  <Uploader
+                    accept="image/png"
+                    action=""
+                    multiple
+                    fileListVisible={false}
+                    shouldUpload={addIcons}
+                  >
+                    <Button appearance="primary" color="blue">
+                      Upload Icons
+                    </Button>
+                  </Uploader>
+                </Stack>
               </>
             </Panel>
           </Col>
@@ -135,17 +165,23 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
         </Row>
       </Grid>
       <br />
-      <TagGroup>
-        {items.map((item) => (
-          <Whisper
-            placement="top"
-            trigger="hover"
-            speaker={<Tooltip>{item.internalName}</Tooltip>}
-          >
-            <Tag color={item.icon === "" ? "red" : "green"}>{item.name}</Tag>
-          </Whisper>
-        ))}
-      </TagGroup>
+      <Panel header={<h3>Loaded items</h3>}>
+        <TagGroup>
+          {items.map((item) => (
+            <Whisper
+              key={item.internalName}
+              placement="top"
+              trigger="hover"
+              speaker={<Tooltip>{item.internalName}</Tooltip>}
+            >
+              <Tag color={item.icon === "" ? "red" : "green"}>
+                {item.icon.length > 0 && <img height={32} src={item.icon} />}
+                {item.name}
+              </Tag>
+            </Whisper>
+          ))}
+        </TagGroup>
+      </Panel>
     </Container>
   );
 };
