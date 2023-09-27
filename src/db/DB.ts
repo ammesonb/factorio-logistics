@@ -3,7 +3,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 
 const DB_NAME = "FactorioLogistics";
 
-export interface Icon {
+export interface Item {
+  internalName: string;
   name: string;
   icon: string;
 }
@@ -35,7 +36,7 @@ interface IResource {
 }
 
 class LogisticsDB extends Dexie {
-  icons!: Table<Icon>;
+  items!: Table<Item>;
   surfaces!: Table<ISurface>;
   categories!: Table<ICategory>;
   lines!: Table<ILine>;
@@ -44,7 +45,7 @@ class LogisticsDB extends Dexie {
   constructor() {
     super(DB_NAME);
     this.version(1).stores({
-      icons: "name",
+      items: "internalName, name",
       surfaces: "++id, name",
       categories: "++id, surfaceID, name",
       lines: "++id, categoryID, name",
@@ -102,6 +103,6 @@ export const DB_CONFIG = {
 }
 */
 
-export const dataLoaded = (): boolean => {
-  return useLiveQuery(() => db.icons.toArray(), [], ["a"]).length > 0;
+export const hasData = (): boolean => {
+  return useLiveQuery(() => db.items.toArray(), [], []).length > 0;
 };
