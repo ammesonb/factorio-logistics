@@ -24,6 +24,7 @@ import {
   // memoizeCategories,
   // memoizeLines,
   parseDBData,
+  RESOURCE,
   Resource,
   SURFACE,
   Surface,

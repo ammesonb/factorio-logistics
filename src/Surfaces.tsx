@@ -7,7 +7,7 @@ import { IconProps } from "@rsuite/icons/lib/Icon";
 const generateSurfaceMenu = (
   surface: Surface,
   activeKey: string,
-  setActive: (activeKey: string) => void,
+  setActiveKey: (activeKey: string) => void,
   onPageChange: (pageType: string, id: string | number) => void,
   onAdd: (type: string, parent: string | number) => void,
   onDelete: (type: string, id: string | number, name: string) => void,
@@ -21,14 +21,11 @@ const generateSurfaceMenu = (
     surface.name,
     surface,
     activeKey,
+    setActiveKey,
+    onPageChange,
     onAdd,
     onDelete,
   );
-
-  const selectSurface = () => {
-    setActive(surfaceKey);
-    onPageChange(SURFACE, surface.name);
-  };
 
   return surface.categories.length > 0 ? (
     <Nav.Menu
@@ -36,13 +33,12 @@ const generateSurfaceMenu = (
       eventKey={surfaceKey}
       icon={surfaceIcon}
       title={surfaceTitle}
-      onClick={selectSurface}
     >
       {surface.categories.map((category) =>
         generateCategoryMenu(
           category,
           activeKey,
-          setActive,
+          setActiveKey,
           onPageChange,
           onAdd,
           onDelete,
@@ -50,12 +46,7 @@ const generateSurfaceMenu = (
       )}
     </Nav.Menu>
   ) : (
-    <Nav.Item
-      key={surfaceKey}
-      eventKey={surfaceKey}
-      icon={surfaceIcon}
-      onClick={selectSurface}
-    >
+    <Nav.Item key={surfaceKey} eventKey={surfaceKey} icon={surfaceIcon}>
       {surfaceTitle}
     </Nav.Item>
   );
@@ -64,7 +55,7 @@ const generateSurfaceMenu = (
 const generateCategoryMenu = (
   category: Category,
   activeKey: string,
-  setActive: (activeKey: string) => void,
+  setActiveKey: (activeKey: string) => void,
   onPageChange: (pageType: string, id: string | number) => void,
   onAdd: (type: string, parent: string | number) => void,
   onDelete: (type: string, id: string | number, name: string) => void,
@@ -78,14 +69,11 @@ const generateCategoryMenu = (
     category.id as number,
     category,
     activeKey,
+    setActiveKey,
+    onPageChange,
     onAdd,
     onDelete,
   );
-
-  const selectCategory = () => {
-    setActive(categoryKey);
-    onPageChange(CATEGORY, category.id as number);
-  };
 
   return category.lines.length > 0 ? (
     <Nav.Menu
@@ -93,13 +81,12 @@ const generateCategoryMenu = (
       eventKey={categoryKey}
       icon={categoryIcon}
       title={categoryTitle}
-      onClick={selectCategory}
     >
       {category.lines.map((line) =>
         generateLineMenu(
           line,
           activeKey,
-          setActive,
+          setActiveKey,
           onPageChange,
           onAdd,
           onDelete,
@@ -107,12 +94,7 @@ const generateCategoryMenu = (
       )}
     </Nav.Menu>
   ) : (
-    <Nav.Item
-      key={categoryKey}
-      eventKey={categoryKey}
-      icon={categoryIcon}
-      onClick={selectCategory}
-    >
+    <Nav.Item key={categoryKey} eventKey={categoryKey} icon={categoryIcon}>
       {categoryTitle}
     </Nav.Item>
   );
@@ -121,7 +103,7 @@ const generateCategoryMenu = (
 const generateLineMenu = (
   line: Line,
   activeKey: string,
-  setActive: (activeKey: string) => void,
+  setActiveKey: (activeKey: string) => void,
   onPageChange: (pageType: string, id: string | number) => void,
   onAdd: (type: string, parent: string | number) => void,
   onDelete: (type: string, id: string | number, name: string) => void,
@@ -131,17 +113,14 @@ const generateLineMenu = (
     line.id as number,
     line,
     activeKey,
+    setActiveKey,
+    onPageChange,
     onAdd,
     onDelete,
   );
 
-  const selectLine = () => {
-    setActive(lineKey);
-    onPageChange(LINE, line.id as number);
-  };
-
   return (
-    <Nav.Item key={lineKey} eventKey={lineKey} onClick={selectLine}>
+    <Nav.Item key={lineKey} eventKey={lineKey}>
       {lineTitle}
     </Nav.Item>
   );
@@ -152,6 +131,8 @@ const generateButtons = (
   id: string | number,
   obj: Surface | Category | Line,
   activeKey: string,
+  setActiveKey: (activeKey: string) => void,
+  onPageChange: (pageType: string, id: string | number) => void,
   onAdd: (type: string, parent: string | number) => void,
   onDelete: (type: string, id: string | number, name: string) => void,
 ) => {
@@ -186,8 +167,16 @@ const generateButtons = (
   );
 
   const title = (
-    <Stack spacing={8}>
-      <span style={color}>{obj.name}</span>
+    <Stack
+      spacing={8}
+      onClick={() => {
+        setActiveKey(key);
+        onPageChange(type, id);
+      }}
+    >
+      <Stack.Item>
+        <div style={color}>{obj.name}</div>
+      </Stack.Item>
       <Stack.Item grow={1} />
       {HIERARCHY[type] && (
         <IconButton
