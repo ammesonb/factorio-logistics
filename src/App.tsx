@@ -164,19 +164,45 @@ const App = () => {
   ) => {
     switch (type) {
       case SURFACE:
-        db.surfaces
-          .delete(id as string)
-          .catch((e) => setError(`Failed to remove surface: ${e}`));
+        db.categories
+          .where({ surface: id })
+          .toArray()
+          .then((categories) => {
+            categories.forEach((category) =>
+              deleteEntry(CATEGORY, category.id as number, () => {}),
+            );
+          })
+          .then(() =>
+            db.surfaces
+              .delete(id as string)
+              .catch((e) => setError(`Failed to remove surface: ${e}`)),
+          );
         break;
       case CATEGORY:
-        db.categories
-          .delete(id as number)
-          .catch((e) => setError(`Failed to remove surface: ${e}`));
+        db.lines
+          .where({ categoryID: id })
+          .toArray()
+          .then((lines) =>
+            lines.forEach((line) =>
+              deleteEntry(LINE, line.id as number, () => {}),
+            ),
+          )
+          .then(() =>
+            db.categories
+              .delete(id as number)
+              .catch((e) => setError(`Failed to remove category: ${e}`)),
+          );
         break;
       case LINE:
-        db.lines
-          .delete(id as number)
-          .catch((e) => setError(`Failed to remove surface: ${e}`));
+        db.resources
+          .where({ lineID: id })
+          .delete()
+          .catch((e) => setError(`Failed to remove resources: ${e}`))
+          .then(() =>
+            db.lines
+              .delete(id as number)
+              .catch((e) => setError(`Failed to remove line: ${e}`)),
+          );
         break;
     }
 
