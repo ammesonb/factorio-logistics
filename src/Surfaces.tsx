@@ -43,11 +43,12 @@ export const Surfaces = ({
             onPageChange(pageType, pageID);
           }}
         >
-          {surfaces.map((surface) =>
-            surface.categories.length > 0 ? (
+          {surfaces.map((surface) => {
+            const key = `surface-${surface.name}`;
+            return surface.categories.length > 0 ? (
               <Nav.Menu
-                key={`surface-${surface.name}`}
-                eventKey={`surface-${surface.name}`}
+                key={key}
+                eventKey={key}
                 icon={<Global />}
                 title={surface.name}
               >
@@ -79,15 +80,11 @@ export const Surfaces = ({
                 )}
               </Nav.Menu>
             ) : (
-              <Nav.Item
-                key={`surface-${surface.name}`}
-                icon={<Global />}
-                eventKey={`surface-${surface.name}`}
-              >
+              <Nav.Item key={key} icon={<Global />} eventKey={key}>
                 {surface.name}
               </Nav.Item>
-            ),
-          )}
+            );
+          })}
         </Nav>
       </Sidenav.Body>
     </Sidenav>

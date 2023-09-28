@@ -123,3 +123,57 @@ export interface Line {
   name: string;
   resources: Resource[];
 }
+
+export const parseDBData = (
+  rawSurfaces: ISurface[],
+  rawCategories: ICategory[],
+  rawLines: ILine[],
+  rawResources: Resource[],
+): Surface[] => {
+  // First initialize "real" surfaces
+  const s = [...rawSurfaces].map((s) => ({ ...s, categories: [] }));
+
+  const surfacesByName: { [key: string]: Surface } = {};
+  s.forEach((surface) => (surfacesByName[surface.name] = surface));
+
+  // Then populate categories, lines, and resources
+  const categoriesByID: { [key: string]: Category } = {};
+  const linesByID: { [key: string]: Line } = {};
+
+  rawCategories.forEach((dbCat) => {
+    const category = { ...dbCat, lines: [] };
+    surfacesByName[category.surface].categories.push(category);
+    categoriesByID[category.id] = category;
+  });
+
+  rawLines.forEach((dbLine) => {
+    const line = { ...dbLine, resources: [] };
+    categoriesByID[line.categoryID].lines.push(line);
+    linesByID[line.id] = line;
+  });
+
+  rawResources.forEach((dbRes) => {
+    linesByID[dbRes.lineID].resources.push(dbRes);
+  });
+  return s;
+};
+
+export const analyzeResourceUsage = (rawResources: Resource[]) => {
+  const byID: { [key: string]: number } = {};
+  const resourcesSeen: Set<Resource> = new Set();
+  const linesByResource: { [key: string]: string[] } = {};
+  rawResources.forEach((resource) => {
+    resourcesSeen.add(resource);
+    byID[resource.item] =
+      byID?.[resource.item] +
+      (resource.isConsumed ? -1 : 1) * resource.quantityPerSec;
+    linesByResource[resource.item] = [
+      ...(linesByResource?.[resource.item] || []),
+      resource.lineID,
+    ];
+  });
+
+  return { byID, resourcesSeen: Array.from(resourcesSeen), linesByResource };
+};
+
+export const addSurface = (name: string) => db.surfaces.add({ name });

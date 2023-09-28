@@ -1,16 +1,26 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Container, Content, Header, Sidebar, Stack } from "rsuite";
+import {
+  Button,
+  Container,
+  Content,
+  Header,
+  InputPicker,
+  Sidebar,
+  Stack,
+} from "rsuite";
 import { DataLoader } from "./DataLoader";
-import { Category, db, Item, Line, Resource, Surface } from "./db/DB";
+import { analyzeResourceUsage, db, Item, parseDBData, Surface } from "./db/DB";
 import { Resources } from "./Resources";
 import { Surfaces } from "./Surfaces";
 
 const App = () => {
-  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(true);
 
   const [itemsByID, setItems] = useState<{ [key: string]: Item }>({});
   const rawItems = useLiveQuery(() => db.items.toArray(), [], []);
+
+  const [timeUnit, setTimeUnit] = useState(1);
 
   // Parse items into a searchable format by internal name
   useEffect(() => {
@@ -20,82 +30,43 @@ const App = () => {
   }, [rawItems]);
 
   // Pull raw configuration data
-  const rawData = {
-    surfaces: useLiveQuery(() => db.surfaces.toArray(), [], []),
-    categories: useLiveQuery(() => db.categories.toArray(), [], []),
-    lines: useLiveQuery(() => db.lines.toArray(), [], []),
-    resources: useLiveQuery(() => db.resources.toArray(), [], []),
-  };
+  const rawSurfaces = useLiveQuery(() => db.surfaces.toArray(), [], []);
+  const rawCategories = useLiveQuery(() => db.categories.toArray(), [], []);
+  const rawLines = useLiveQuery(() => db.lines.toArray(), [], []);
+  const rawResources = useLiveQuery(() => db.resources.toArray(), [], []);
 
   // Collate the various raw data points into a nested hierarchy
-  const surfaces: Surface[] = useMemo(() => {
-    // First initialize "real" surfaces
-    const s = [...rawData.surfaces].map((s) => ({ ...s, categories: [] }));
+  const surfaces: Surface[] = useMemo(
+    () => parseDBData(rawSurfaces, rawCategories, rawLines, rawResources),
+    [rawSurfaces, rawCategories, rawLines, rawResources],
+  );
 
-    const surfacesByName: { [key: string]: Surface } = {};
-    s.forEach((surface) => (surfacesByName[surface.name] = surface));
-
-    // Then populate categories, lines, and resources
-    const categoriesByID: { [key: string]: Category } = {};
-    const linesByID: { [key: string]: Line } = {};
-
-    rawData.categories.forEach((dbCat) => {
-      const category = { ...dbCat, lines: [] };
-      surfacesByName[category.surface].categories.push(category);
-      categoriesByID[category.id] = category;
-    });
-
-    rawData.lines.forEach((dbLine) => {
-      const line = { ...dbLine, resources: [] };
-      categoriesByID[line.categoryID].lines.push(line);
-      linesByID[line.id] = line;
-    });
-
-    rawData.resources.forEach((dbRes) => {
-      linesByID[dbRes.lineID].resources.push(dbRes);
-    });
-
-    return s;
-  }, [rawData.surfaces, rawData.categories, rawData.lines, rawData.resources]);
-
-  // Summarize resource usage by resource and also cache the lines they are each used in
-  // for easier checking of usage later
-  // resourceSummary
-  const [, setResourceSummary] = useState<{
-    [key: string]: number;
-  }>({});
-  const [usedResources, setUsedResources] = useState<Resource[]>([]);
-  // linesByResource
-  const [, setResourceLines] = useState<{
-    [key: string]: string[];
-  }>({});
-
-  // Each time resources changes, re-index the summary and other references
-  useEffect(() => {
-    const byID: { [key: string]: number } = {};
-    const distinctResources: Set<Resource> = new Set();
-    const linesByResource: { [key: string]: string[] } = {};
-    rawData.resources.forEach((resource) => {
-      distinctResources.add(resource);
-      byID[resource.item] =
-        byID?.[resource.item] +
-        (resource.isConsumed ? -1 : 1) * resource.quantityPerSec;
-      linesByResource[resource.item] = [
-        ...(linesByResource?.[resource.item] || []),
-        resource.lineID,
-      ];
-    });
-
-    setResourceSummary(byID);
-    setUsedResources(Array.from(distinctResources));
-    setResourceLines(linesByResource);
-  }, [rawData.resources]);
+  const {
+    // byID: resourceProduction,
+    resourcesSeen,
+    // linesByResource,
+  } = useMemo(() => analyzeResourceUsage(rawResources), [rawResources]);
 
   return dataLoaded ? (
     <Container>
       <Header style={{ marginBottom: "1%" }}>
         <Stack direction="row" spacing={12}>
           <h2>Factorio Logistics</h2>
+          <Stack.Item style={{ marginLeft: "3%" }}>
+            <h5>Time&nbsp;unit:</h5>
+          </Stack.Item>
+          <Stack.Item basis={120}>
+            <InputPicker
+              data={[
+                { label: "Second", value: 1 },
+                { label: "Minute", value: 60 },
+                { label: "Hour", value: 3600 },
+                { label: "Day", value: 86400 },
+              ]}
+              value={timeUnit}
+              onChange={(unit) => setTimeUnit(unit)}
+            />
+          </Stack.Item>
           <Stack.Item grow={1} />
           <Button
             appearance="primary"
@@ -120,7 +91,7 @@ const App = () => {
         <Sidebar>
           <Resources
             items={itemsByID}
-            resources={usedResources}
+            resources={resourcesSeen}
             onPageChange={() => {}}
           />
         </Sidebar>
