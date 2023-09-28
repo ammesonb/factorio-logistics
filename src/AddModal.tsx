@@ -40,9 +40,7 @@ export const AddModal = ({
   return (
     <Modal autoFocus enforceFocus size="md" open={type !== ""} onClose={clear}>
       <Modal.Header>
-        <Modal.Title>
-          <h3>Add {type}</h3>
-        </Modal.Title>
+        <Modal.Title as="h3">Add {type}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <h6>Name:</h6>

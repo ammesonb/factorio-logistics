@@ -22,9 +22,7 @@ export const DeleteModal = ({
       onClose={onClose}
     >
       <Modal.Header>
-        <Modal.Title>
-          <h3>Add {type}</h3>
-        </Modal.Title>
+        <Modal.Title as="h3">Add {type}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         Are you sure you want to delete the {type} {name}?
