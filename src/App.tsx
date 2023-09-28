@@ -6,15 +6,33 @@ import {
   Content,
   Header,
   InputPicker,
+  Message,
   Sidebar,
   Stack,
 } from "rsuite";
+import { AddModal } from "./AddModal";
 import { DataLoader } from "./DataLoader";
-import { analyzeResourceUsage, db, Item, parseDBData, Surface } from "./db/DB";
+import {
+  analyzeResourceUsage,
+  CATEGORY,
+  db,
+  ICategory,
+  ILine,
+  ISurface,
+  Item,
+  LINE,
+  // memoizeCategories,
+  // memoizeLines,
+  parseDBData,
+  Resource,
+  SURFACE,
+  Surface,
+} from "./db/DB";
 import { Resources } from "./Resources";
 import { Surfaces } from "./Surfaces";
 
 const App = () => {
+  const [error, setError] = useState("");
   const [dataLoaded, setDataLoaded] = useState<boolean>(true);
 
   const [itemsByID, setItems] = useState<{ [key: string]: Item }>({});
@@ -30,10 +48,36 @@ const App = () => {
   }, [rawItems]);
 
   // Pull raw configuration data
-  const rawSurfaces = useLiveQuery(() => db.surfaces.toArray(), [], []);
-  const rawCategories = useLiveQuery(() => db.categories.toArray(), [], []);
-  const rawLines = useLiveQuery(() => db.lines.toArray(), [], []);
-  const rawResources = useLiveQuery(() => db.resources.toArray(), [], []);
+  const rawSurfaces: ISurface[] = useLiveQuery(
+    () =>
+      db.surfaces
+        .toArray()
+        .catch((e) => setError(`Failed to load surfaces: ${e}`)),
+    [],
+    [],
+  ) as ISurface[];
+  const rawCategories: ICategory[] = useLiveQuery(
+    () =>
+      db.categories
+        .toArray()
+        .catch((e) => setError(`Failed to load categories: ${e}`)),
+    [],
+    [],
+  ) as ICategory[];
+  const rawLines: ILine[] = useLiveQuery(
+    () =>
+      db.lines.toArray().catch((e) => setError(`Failed to load lines: ${e}`)),
+    [],
+    [],
+  ) as ILine[];
+  const rawResources: Resource[] = useLiveQuery(
+    () =>
+      db.resources
+        .toArray()
+        .catch((e) => setError(`Failed to load resources: ${e}`)),
+    [],
+    [],
+  ) as Resource[];
 
   // Collate the various raw data points into a nested hierarchy
   const surfaces: Surface[] = useMemo(
@@ -47,6 +91,58 @@ const App = () => {
     // linesByResource,
   } = useMemo(() => analyzeResourceUsage(rawResources), [rawResources]);
 
+  /*
+  const categoriesByID = useMemo(
+    () => memoizeCategories(rawCategories),
+    [rawCategories],
+  );
+
+  const linesByID = useMemo(() => memoizeLines(rawLines), [rawLines]);
+   */
+
+  const [addType, setAddType] = useState("");
+  const [addParent, setAddParent] = useState("");
+
+  const openAddDialog = useMemo(
+    () => (type: string, parent: string) => {
+      setAddType(type);
+      setAddParent(parent);
+    },
+    [setAddType, setAddParent],
+  );
+
+  const add = (
+    type: string,
+    parent: string,
+    name: string,
+    onComplete: () => void,
+    mostlyConsumes?: boolean,
+  ) => {
+    switch (type) {
+      case SURFACE:
+        db.surfaces
+          .add({ name })
+          .catch((e) => setError(`Failed to add surface: ${e}`));
+        break;
+      case CATEGORY:
+        db.categories
+          .add({
+            name,
+            surface: parent,
+            mostlyConsumes: mostlyConsumes ?? true,
+          })
+          .catch((e) => setError(`Failed to add category: ${e}`));
+        break;
+      case LINE:
+        db.lines
+          .add({ name, categoryID: parent })
+          .catch((e) => setError(`Failed to add line: ${e}`));
+        break;
+    }
+
+    onComplete();
+  };
+
   return dataLoaded ? (
     <Container>
       <Header style={{ marginBottom: "1%" }}>
@@ -55,7 +151,7 @@ const App = () => {
           <Stack.Item style={{ marginLeft: "3%" }}>
             <h5>Time&nbsp;unit:</h5>
           </Stack.Item>
-          <Stack.Item basis={120}>
+          <Stack.Item basis="120px">
             <InputPicker
               data={[
                 { label: "Second", value: 1 },
@@ -85,9 +181,21 @@ const App = () => {
       </Header>
       <Container>
         <Sidebar>
-          <Surfaces surfaces={surfaces} onPageChange={() => {}} />
+          <Surfaces
+            surfaces={surfaces}
+            onPageChange={() => {}}
+            onAdd={openAddDialog}
+          />
         </Sidebar>
-        <Content>Content</Content>
+        <Content style={{ padding: "0px 2% 0px 2%" }}>
+          {error !== "" && <Message type="error">{error}</Message>}
+          <AddModal
+            type={addType}
+            parent={addParent}
+            onAdd={add}
+            onClose={() => setAddType("")}
+          />
+        </Content>
         <Sidebar>
           <Resources
             items={itemsByID}

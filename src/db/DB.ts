@@ -2,31 +2,36 @@ import Dexie, { Table } from "dexie";
 
 const DB_NAME = "FactorioLogistics";
 
+export const SURFACE = "surface";
+export const CATEGORY = "category";
+export const LINE = "line";
+export const RESOURCE = "resource";
+
 export interface Item {
   internalName: string;
   name: string;
   icon: string;
 }
 
-interface ISurface {
+export interface ISurface {
   name: string;
 }
 
-interface ICategory {
-  id: string;
+export interface ICategory {
+  id?: string;
   surface: string;
   name: string;
   mostlyConsumes: boolean;
 }
 
-interface ILine {
-  id: string;
+export interface ILine {
+  id?: string;
   categoryID: string;
   name: string;
 }
 
 export interface Resource {
-  id: string;
+  id?: string;
   lineID: string;
   item: string;
   quantityPerSec: number;
@@ -59,67 +64,20 @@ db.surfaces.get("Nauvis").then((n) => {
   }
 });
 
-/*
-export const DB_CONFIG = {
-  name: DB_NAME,
-  version: 1,
-  objectStoresMeta: [
-    {
-      store: ICON_STORE,
-      storeConfig: {keyPath: "name", autoIncrement: false},
-      storeSchema: [
-        {name: "name", keypath: "name", options: {unique: true}},
-        {name: "icon", keypath: "icon", options: {unique: false}},
-      ]
-    },
-    {
-    store: SURFACE_STORE,
-    storeConfig: {keyPath: "id", autoIncrement: true},
-      storeSchema: [
-        {name: "name", keypath: "name", options: {unique: true}},
-      ],
-    }, {
-    store: CATEGORY_STORE,
-    storeConfig: {keyPath: "id", autoIncrement: true},
-      storeSchema: [
-        {name: "surface", keypath: "surface_id", options: {unique: false}},
-        {name: "name", keypath: "name", options: {unique: false}},
-        {name: "mostlyConsumes", keypath: "mostly_consumes", options: {unique: false}},
-      ],
-    }, {
-    store: LINE_STORE,
-    storeConfig: {keyPath: "id", autoIncrement: true},
-      storeSchema: [
-        {name: "category", keypath: "category_id", options: {unique: false}},
-        {name: "name", keypath: "name", options: {unique: false}},
-      ],
-    }, {
-    store: RESOURCE_STORE,
-    storeConfig: {keyPath: "id", autoIncrement: true},
-      storeSchema: [
-        {name: "item", keypath: "item_name", options: {unique: false}},
-        {name: "quantityPerSec", keypath: "quantity_per_second", options: {unique: false}},
-        {name: "isConsumed", keypath: "item_is_consumed", options: {unique: false}},
-      ],
-    }
-  ],
-}
-*/
-
 export interface Surface {
   name: string;
   categories: Category[];
 }
 
 export interface Category {
-  id: string;
+  id?: string;
   name: string;
   mostlyConsumes: boolean;
   lines: Line[];
 }
 
 export interface Line {
-  id: string;
+  id?: string;
   name: string;
   resources: Resource[];
 }
@@ -143,13 +101,13 @@ export const parseDBData = (
   rawCategories.forEach((dbCat) => {
     const category = { ...dbCat, lines: [] };
     surfacesByName[category.surface].categories.push(category);
-    categoriesByID[category.id] = category;
+    categoriesByID[category?.id as string] = category;
   });
 
   rawLines.forEach((dbLine) => {
     const line = { ...dbLine, resources: [] };
     categoriesByID[line.categoryID].lines.push(line);
-    linesByID[line.id] = line;
+    linesByID[line?.id as string] = line;
   });
 
   rawResources.forEach((dbRes) => {
@@ -158,9 +116,26 @@ export const parseDBData = (
   return s;
 };
 
+export const memoizeCategories = (
+  categories: ICategory[],
+): { [key: string]: ICategory } => {
+  const byID: { [key: string]: ICategory } = {};
+  categories.forEach((category) => (byID[category?.id as string] = category));
+  return byID;
+};
+
+export const memoizeLines = (lines: ILine[]): { [key: string]: ILine } => {
+  const byID: { [key: string]: ILine } = {};
+  lines.forEach((line) => (byID[line?.id as string] = line));
+  return byID;
+};
+
 export const analyzeResourceUsage = (rawResources: Resource[]) => {
+  // Calculate each resource's production/consumption
   const byID: { [key: string]: number } = {};
+  // Track each unique resource seen in the lines
   const resourcesSeen: Set<Resource> = new Set();
+  // Track each line where a resource is produced or consumed
   const linesByResource: { [key: string]: string[] } = {};
   rawResources.forEach((resource) => {
     resourcesSeen.add(resource);
@@ -177,3 +152,12 @@ export const analyzeResourceUsage = (rawResources: Resource[]) => {
 };
 
 export const addSurface = (name: string) => db.surfaces.add({ name });
+
+export const addCategory = (
+  name: string,
+  surface: string,
+  mostlyConsumes: boolean,
+) => db.categories.add({ name, surface, mostlyConsumes });
+
+export const addLine = (name: string, categoryID: string) =>
+  db.lines.add({ name, categoryID });

@@ -1,5 +1,5 @@
 import { Divider, IconButton, Nav, Sidenav, Stack } from "rsuite";
-import { Surface } from "./db/DB";
+import { SURFACE, Surface } from "./db/DB";
 import { Global, Table } from "@rsuite/icons";
 import { useState } from "react";
 
@@ -10,9 +10,11 @@ import { useState } from "react";
 export const Surfaces = ({
   surfaces,
   onPageChange,
+  onAdd,
 }: {
   surfaces: Surface[];
   onPageChange: (pageType: string, id: string) => void;
+  onAdd: (type: string, parent: string) => void;
 }) => {
   const [active, setActive] = useState("surface-nauvis");
   return (
@@ -27,7 +29,12 @@ export const Surfaces = ({
             <h3>Surfaces</h3>
           </Stack.Item>
           <Stack.Item>
-            <IconButton icon={<Global />} appearance="primary" color="green">
+            <IconButton
+              icon={<Global />}
+              appearance="primary"
+              color="green"
+              onClick={() => onAdd(SURFACE, "")}
+            >
               Add
             </IconButton>
           </Stack.Item>
