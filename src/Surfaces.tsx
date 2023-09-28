@@ -3,6 +3,10 @@ import { Surface } from "./db/DB";
 import { Global, Table } from "@rsuite/icons";
 import { useState } from "react";
 
+/* TODO: delete a surface, category, etc with prompt via modal */
+/* TODO: add modal */
+/* TODO: add category/line buttons */
+
 export const Surfaces = ({
   surfaces,
   onPageChange,

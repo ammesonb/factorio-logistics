@@ -1,6 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useState } from "react";
-import { Container, Content, Header, Sidebar } from "rsuite";
+import { Button, Container, Content, Header, Sidebar, Stack } from "rsuite";
 import { DataLoader } from "./DataLoader";
 import { Category, db, Item, Line, Resource, Surface } from "./db/DB";
 import { Resources } from "./Resources";
@@ -93,7 +93,25 @@ const App = () => {
 
   return dataLoaded ? (
     <Container>
-      <Header>Header</Header>
+      <Header style={{ marginBottom: "1%" }}>
+        <Stack direction="row" spacing={12}>
+          <h2>Factorio Logistics</h2>
+          <Stack.Item grow={1} />
+          <Button
+            appearance="primary"
+            color="cyan"
+            onClick={() => setDataLoaded(false)}
+          >
+            Update Item List
+          </Button>
+          <Button appearance="primary" color="green">
+            Import
+          </Button>
+          <Button appearance="primary" color="violet">
+            Export
+          </Button>
+        </Stack>
+      </Header>
       <Container>
         <Sidebar>
           <Surfaces surfaces={surfaces} onPageChange={() => {}} />

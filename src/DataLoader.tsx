@@ -104,8 +104,11 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
   - \`<factorio executable> --dump-prototype-locale\`
   - \`<factorio executable> --dump-icon-sprites\`
   - Note for steam, you may need to use the following: \`<steam executable> -applaunch 427520 --dump-<etc>\` instead
-  - If there are errors in the \`factorio-current.log\` file, that may prevent export. You may need to lower graphics quality to "normal" if it is set to "high", depending on installed mods.
-2 Locate your script-output directory, which should be in your [user data directory](https://wiki.factorio.com/Application_directory#Locations)
+  - If there are errors in the \`factorio-current.log\` file, that may prevent export
+
+    You may need to lower graphics quality to "normal" if it is set to "high", depending on installed mods
+
+2. Locate your script-output directory, which should be in your [user data directory](https://wiki.factorio.com/Application_directory#Locations)
 3. Upload the \`item-locale.json\` and \`fluid-locale.json\` files using the "Upload Items" button
 4. Upload the \`item\` and \`fluid\` directories for corresponding icons
 5. Check all expected icons present ("Done" button should be green or yellow)
