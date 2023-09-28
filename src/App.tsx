@@ -28,6 +28,7 @@ import {
   SURFACE,
   Surface,
 } from "./db/DB";
+import { DeleteModal } from "./DeleteModal";
 import { Resources } from "./Resources";
 import { Surfaces } from "./Surfaces";
 
@@ -143,6 +144,45 @@ const App = () => {
     onComplete();
   };
 
+  const [deleteType, setDeleteType] = useState("");
+  const [deleteID, setDeleteID] = useState<string | number>("");
+  const [deleteName, setDeleteName] = useState("");
+
+  const openDeleteDialog = useMemo(
+    () => (type: string, id: string | number, name: string) => {
+      setDeleteType(type);
+      setDeleteID(id);
+      setDeleteName(name);
+    },
+    [setDeleteType, setDeleteID, setDeleteName],
+  );
+
+  const deleteEntry = (
+    type: string,
+    id: string | number,
+    onComplete: () => void,
+  ) => {
+    switch (type) {
+      case SURFACE:
+        db.surfaces
+          .delete(id as string)
+          .catch((e) => setError(`Failed to remove surface: ${e}`));
+        break;
+      case CATEGORY:
+        db.categories
+          .delete(id as number)
+          .catch((e) => setError(`Failed to remove surface: ${e}`));
+        break;
+      case LINE:
+        db.lines
+          .delete(id as number)
+          .catch((e) => setError(`Failed to remove surface: ${e}`));
+        break;
+    }
+
+    onComplete();
+  };
+
   return dataLoaded ? (
     <Container>
       <Header style={{ marginBottom: "1%" }}>
@@ -185,6 +225,7 @@ const App = () => {
             surfaces={surfaces}
             onPageChange={() => {}}
             onAdd={openAddDialog}
+            onDelete={openDeleteDialog}
           />
         </Sidebar>
         <Content style={{ padding: "0px 2% 0px 2%" }}>
@@ -194,6 +235,13 @@ const App = () => {
             parent={addParent}
             onAdd={add}
             onClose={() => setAddType("")}
+          />
+          <DeleteModal
+            type={deleteType}
+            id={deleteID}
+            name={deleteName}
+            onDelete={deleteEntry}
+            onClose={() => setDeleteType("")}
           />
         </Content>
         <Sidebar>

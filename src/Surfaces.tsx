@@ -11,10 +11,12 @@ export const Surfaces = ({
   surfaces,
   onPageChange,
   onAdd,
+  onDelete,
 }: {
   surfaces: Surface[];
   onPageChange: (pageType: string, id: string) => void;
   onAdd: (type: string, parent: string) => void;
+  onDelete: (type: string, id: string | number, name: string) => void;
 }) => {
   const [active, setActive] = useState("surface-Nauvis");
   return (
@@ -72,6 +74,7 @@ export const Surfaces = ({
                   icon={<Trash />}
                   onClick={(e) => {
                     e.stopPropagation();
+                    onDelete(SURFACE, surface.name, surface.name);
                   }}
                 />
               </Stack>
