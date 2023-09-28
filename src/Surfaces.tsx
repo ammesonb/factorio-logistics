@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Nav, Sidenav } from "rsuite";
+import { Divider, IconButton, Nav, Sidenav, Stack } from "rsuite";
 import { Surface } from "./db/DB";
 import { Global, Table } from "@rsuite/icons";
+import { useState } from "react";
 
 export const Surfaces = ({
   surfaces,
@@ -10,12 +10,35 @@ export const Surfaces = ({
   surfaces: Surface[];
   onPageChange: (pageType: string, id: string) => void;
 }) => {
-  const [expanded, setExpand] = useState(true);
-
+  const [active, setActive] = useState("surface-nauvis");
   return (
-    <Sidenav expanded={expanded} defaultOpenKeys={["Nauvis"]}>
+    <Sidenav defaultOpenKeys={["Nauvis"]}>
+      <Sidenav.Header style={{ padding: "5% 5% 0% 5%" }}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-around"
+        >
+          <Stack.Item>
+            <h3>Surfaces</h3>
+          </Stack.Item>
+          <Stack.Item>
+            <IconButton icon={<Global />} appearance="primary" color="green">
+              Add
+            </IconButton>
+          </Stack.Item>
+        </Stack>
+      </Sidenav.Header>
+      <Divider />
       <Sidenav.Body>
-        <Nav>
+        <Nav
+          activeKey={active}
+          onSelect={(eventKey: string) => {
+            setActive(eventKey);
+            const [pageType, pageID] = eventKey.split("-", 2);
+            onPageChange(pageType, pageID);
+          }}
+        >
           {surfaces.map((surface) =>
             surface.categories.length > 0 ? (
               <Nav.Menu
@@ -63,7 +86,6 @@ export const Surfaces = ({
           )}
         </Nav>
       </Sidenav.Body>
-      <Sidenav.Toggle onToggle={setExpand} />
     </Sidenav>
   );
 };
