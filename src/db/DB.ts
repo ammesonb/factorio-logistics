@@ -9,13 +9,12 @@ export interface Item {
 }
 
 interface ISurface {
-  id: string;
   name: string;
 }
 
 interface ICategory {
   id: string;
-  surfaceID: string;
+  surface: string;
   name: string;
   mostlyConsumes: boolean;
 }
@@ -26,7 +25,7 @@ interface ILine {
   name: string;
 }
 
-interface IResource {
+export interface Resource {
   id: string;
   lineID: string;
   item: string;
@@ -39,14 +38,14 @@ class LogisticsDB extends Dexie {
   surfaces!: Table<ISurface>;
   categories!: Table<ICategory>;
   lines!: Table<ILine>;
-  resources!: Table<IResource>;
+  resources!: Table<Resource>;
 
   constructor() {
     super(DB_NAME);
     this.version(1).stores({
       items: "internalName, name",
-      surfaces: "++id, name",
-      categories: "++id, surfaceID, name",
+      surfaces: "name",
+      categories: "++id, surface, name",
       lines: "++id, categoryID, name",
       resources: "++id, lineID, item",
     });
@@ -54,6 +53,11 @@ class LogisticsDB extends Dexie {
 }
 
 export const db = new LogisticsDB();
+db.surfaces.get("Nauvis").then((n) => {
+  if (n === undefined) {
+    db.surfaces.add({ name: "Nauvis" });
+  }
+});
 
 /*
 export const DB_CONFIG = {
@@ -101,3 +105,21 @@ export const DB_CONFIG = {
   ],
 }
 */
+
+export interface Surface {
+  name: string;
+  categories: Category[];
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  mostlyConsumes: boolean;
+  lines: Line[];
+}
+
+export interface Line {
+  id: string;
+  name: string;
+  resources: Resource[];
+}
