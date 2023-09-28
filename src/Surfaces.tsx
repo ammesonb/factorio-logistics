@@ -1,6 +1,6 @@
 import { Divider, IconButton, Nav, Sidenav, Stack } from "rsuite";
-import { SURFACE, Surface } from "./db/DB";
-import { Global, Table } from "@rsuite/icons";
+import { CATEGORY, SURFACE, Surface } from "./db/DB";
+import { Global, Table, Trash } from "@rsuite/icons";
 import { useState } from "react";
 
 /* TODO: delete a surface, category, etc with prompt via modal */
@@ -16,7 +16,7 @@ export const Surfaces = ({
   onPageChange: (pageType: string, id: string) => void;
   onAdd: (type: string, parent: string) => void;
 }) => {
-  const [active, setActive] = useState("surface-nauvis");
+  const [active, setActive] = useState("surface-Nauvis");
   return (
     <Sidenav defaultOpenKeys={["Nauvis"]}>
       <Sidenav.Header style={{ padding: "5% 5% 0% 5%" }}>
@@ -45,19 +45,43 @@ export const Surfaces = ({
         <Nav
           activeKey={active}
           onSelect={(eventKey: string) => {
+            console.log(eventKey);
             setActive(eventKey);
             const [pageType, pageID] = eventKey.split("-", 2);
             onPageChange(pageType, pageID);
           }}
         >
           {surfaces.map((surface) => {
-            const key = `surface-${surface.name}`;
+            const surfaceKey = `surface-${surface.name}`;
+            const surfaceTitle = (
+              <Stack spacing={8}>
+                {surface.name}
+                <Stack.Item grow={1} />
+                <IconButton
+                  appearance="primary"
+                  color="green"
+                  icon={<Table />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAdd(CATEGORY, surface.name);
+                  }}
+                />
+                <IconButton
+                  appearance="primary"
+                  color="red"
+                  icon={<Trash />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              </Stack>
+            );
             return surface.categories.length > 0 ? (
               <Nav.Menu
-                key={key}
-                eventKey={key}
-                icon={<Global />}
-                title={surface.name}
+                key={surfaceKey}
+                eventKey={surfaceKey}
+                icon={<Global style={{ marginTop: "10px" }} />}
+                title={surfaceTitle}
               >
                 {surface.categories.map((category) =>
                   category.lines.length > 0 ? (
@@ -87,8 +111,12 @@ export const Surfaces = ({
                 )}
               </Nav.Menu>
             ) : (
-              <Nav.Item key={key} icon={<Global />} eventKey={key}>
-                {surface.name}
+              <Nav.Item
+                key={surfaceKey}
+                icon={<Global style={{ marginTop: "10px" }} />}
+                eventKey={surfaceKey}
+              >
+                {surfaceTitle}
               </Nav.Item>
             );
           })}

@@ -101,10 +101,10 @@ const App = () => {
    */
 
   const [addType, setAddType] = useState("");
-  const [addParent, setAddParent] = useState("");
+  const [addParent, setAddParent] = useState<string | number>("");
 
   const openAddDialog = useMemo(
-    () => (type: string, parent: string) => {
+    () => (type: string, parent: string | number) => {
       setAddType(type);
       setAddParent(parent);
     },
@@ -113,7 +113,7 @@ const App = () => {
 
   const add = (
     type: string,
-    parent: string,
+    parent: string | number,
     name: string,
     onComplete: () => void,
     mostlyConsumes?: boolean,
@@ -128,14 +128,14 @@ const App = () => {
         db.categories
           .add({
             name,
-            surface: parent,
+            surface: parent as string,
             mostlyConsumes: mostlyConsumes ?? true,
           })
           .catch((e) => setError(`Failed to add category: ${e}`));
         break;
       case LINE:
         db.lines
-          .add({ name, categoryID: parent })
+          .add({ name, categoryID: parent as number })
           .catch((e) => setError(`Failed to add line: ${e}`));
         break;
     }
@@ -180,7 +180,7 @@ const App = () => {
         </Stack>
       </Header>
       <Container>
-        <Sidebar>
+        <Sidebar width={320}>
           <Surfaces
             surfaces={surfaces}
             onPageChange={() => {}}

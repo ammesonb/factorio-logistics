@@ -18,21 +18,21 @@ export interface ISurface {
 }
 
 export interface ICategory {
-  id?: string;
+  id?: number;
   surface: string;
   name: string;
   mostlyConsumes: boolean;
 }
 
 export interface ILine {
-  id?: string;
-  categoryID: string;
+  id?: number;
+  categoryID: number;
   name: string;
 }
 
 export interface Resource {
-  id?: string;
-  lineID: string;
+  id?: number;
+  lineID: number;
   item: string;
   quantityPerSec: number;
   isConsumed: boolean;
@@ -70,14 +70,14 @@ export interface Surface {
 }
 
 export interface Category {
-  id?: string;
+  id?: number;
   name: string;
   mostlyConsumes: boolean;
   lines: Line[];
 }
 
 export interface Line {
-  id?: string;
+  id?: number;
   name: string;
   resources: Resource[];
 }
@@ -95,19 +95,19 @@ export const parseDBData = (
   s.forEach((surface) => (surfacesByName[surface.name] = surface));
 
   // Then populate categories, lines, and resources
-  const categoriesByID: { [key: string]: Category } = {};
-  const linesByID: { [key: string]: Line } = {};
+  const categoriesByID: { [key: number]: Category } = {};
+  const linesByID: { [key: number]: Line } = {};
 
   rawCategories.forEach((dbCat) => {
     const category = { ...dbCat, lines: [] };
     surfacesByName[category.surface].categories.push(category);
-    categoriesByID[category?.id as string] = category;
+    categoriesByID[category?.id as number] = category;
   });
 
   rawLines.forEach((dbLine) => {
     const line = { ...dbLine, resources: [] };
     categoriesByID[line.categoryID].lines.push(line);
-    linesByID[line?.id as string] = line;
+    linesByID[line?.id as number] = line;
   });
 
   rawResources.forEach((dbRes) => {
@@ -118,29 +118,29 @@ export const parseDBData = (
 
 export const memoizeCategories = (
   categories: ICategory[],
-): { [key: string]: ICategory } => {
+): { [key: number]: ICategory } => {
   const byID: { [key: string]: ICategory } = {};
-  categories.forEach((category) => (byID[category?.id as string] = category));
+  categories.forEach((category) => (byID[category?.id as number] = category));
   return byID;
 };
 
-export const memoizeLines = (lines: ILine[]): { [key: string]: ILine } => {
-  const byID: { [key: string]: ILine } = {};
-  lines.forEach((line) => (byID[line?.id as string] = line));
+export const memoizeLines = (lines: ILine[]): { [key: number]: ILine } => {
+  const byID: { [key: number]: ILine } = {};
+  lines.forEach((line) => (byID[line?.id as number] = line));
   return byID;
 };
 
 export const analyzeResourceUsage = (rawResources: Resource[]) => {
   // Calculate each resource's production/consumption
-  const byID: { [key: string]: number } = {};
+  const byName: { [key: string]: number } = {};
   // Track each unique resource seen in the lines
   const resourcesSeen: Set<Resource> = new Set();
   // Track each line where a resource is produced or consumed
-  const linesByResource: { [key: string]: string[] } = {};
+  const linesByResource: { [key: string]: number[] } = {};
   rawResources.forEach((resource) => {
     resourcesSeen.add(resource);
-    byID[resource.item] =
-      byID?.[resource.item] +
+    byName[resource.item] =
+      byName?.[resource.item] +
       (resource.isConsumed ? -1 : 1) * resource.quantityPerSec;
     linesByResource[resource.item] = [
       ...(linesByResource?.[resource.item] || []),
@@ -148,7 +148,7 @@ export const analyzeResourceUsage = (rawResources: Resource[]) => {
     ];
   });
 
-  return { byID, resourcesSeen: Array.from(resourcesSeen), linesByResource };
+  return { byName, resourcesSeen: Array.from(resourcesSeen), linesByResource };
 };
 
 export const addSurface = (name: string) => db.surfaces.add({ name });
@@ -159,5 +159,5 @@ export const addCategory = (
   mostlyConsumes: boolean,
 ) => db.categories.add({ name, surface, mostlyConsumes });
 
-export const addLine = (name: string, categoryID: string) =>
+export const addLine = (name: string, categoryID: number) =>
   db.lines.add({ name, categoryID });

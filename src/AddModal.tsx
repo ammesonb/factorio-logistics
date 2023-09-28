@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Button, Input, Modal, Toggle } from "rsuite";
+import { Button, Input, Modal, Stack, Toggle } from "rsuite";
 
 export const AddModal = ({
   type,
@@ -8,10 +8,10 @@ export const AddModal = ({
   onClose,
 }: {
   type: string;
-  parent: string;
+  parent: string | number;
   onAdd: (
     type: string,
-    parent: string,
+    parent: string | number,
     name: string,
     onComplete: () => void,
     mostlyConsumes?: boolean,
@@ -40,15 +40,20 @@ export const AddModal = ({
   return (
     <Modal autoFocus enforceFocus size="md" open={type !== ""} onClose={clear}>
       <Modal.Header>
-        <Modal.Title>Add {type}</Modal.Title>
+        <Modal.Title>
+          <h3>Add {type}</h3>
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <h6>Name:</h6>
         <Input size="lg" onChange={setName} />
         {type === "category" && (
           <>
-            <h6>Category mostly consumes resources?</h6>
-            <Toggle checked={mostlyConsumes} onChange={setMostlyConsumes} />
+            <br />
+            <Stack direction="row" spacing={8}>
+              <Toggle checked={mostlyConsumes} onChange={setMostlyConsumes} />
+              <h6>Category mostly consumes resources?</h6>
+            </Stack>
           </>
         )}
       </Modal.Body>
