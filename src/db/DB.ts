@@ -161,3 +161,94 @@ export const addCategory = (
 
 export const addLine = (name: string, categoryID: number) =>
   db.lines.add({ name, categoryID });
+
+export const addResource = (
+  lineID: number,
+  item: string,
+  isConsumed: boolean,
+) => db.resources.add({ lineID, item, isConsumed, quantityPerSec: 0 });
+
+export const deleteSurface = async (
+  name: string,
+  onError: (e: Error) => void,
+): Promise<string | number | void> => {
+  const categories = db.categories.where({ surface: name });
+  const categoryIDs = (await categories.toArray()).map((c) => c.id as number);
+  const lines = db.lines.where("categoryID").anyOf(categoryIDs);
+  const lineIDs = (await lines.toArray()).map((l) => l.id as number);
+
+  return db.transaction(
+    "rw",
+    db.surfaces,
+    db.categories,
+    db.lines,
+    db.resources,
+    async () =>
+      // To avoid losing references, need to reverse the chain of references
+      // Above references are stale, so need to re-run queries again for deletion
+      db.resources
+        .where("lineID")
+        .anyOf(lineIDs)
+        .delete()
+        .then(() =>
+          db.lines
+            .where("id")
+            .anyOf(lineIDs)
+            .delete()
+            .then(() =>
+              db.categories
+                .where("id")
+                .anyOf(categoryIDs)
+                .delete()
+                .then(() => db.surfaces.delete(name).catch(onError))
+                .catch(onError),
+            )
+            .catch(onError),
+        )
+        .catch(onError),
+  );
+};
+
+export const deleteCategory = async (
+  id: number,
+  onError: (e: Error) => void,
+): Promise<number | string | void> => {
+  const lines = db.lines.where({
+    categoryID: id,
+  });
+  const lineIDs = (await lines.toArray()).map((l) => l.id as number);
+
+  return db.transaction("rw", db.categories, db.lines, db.resources, async () =>
+    // To avoid losing references, need to reverse the chain of references
+    db.resources
+      .where("lineID")
+      .anyOf(lineIDs)
+      .delete()
+      .then(() =>
+        db.lines
+          .where("id")
+          .anyOf(lineIDs)
+          .delete()
+          .then(() => db.categories.delete(id).catch(onError))
+          .catch(onError),
+      )
+      .catch(onError),
+  );
+};
+
+export const deleteLine = async (
+  id: number,
+  onError: (e: Error) => void,
+): Promise<number | string | void> => {
+  return db.transaction("rw", db.categories, db.lines, db.resources, async () =>
+    // To avoid losing references, need to reverse the chain of references
+    db.resources
+      .where({ lineID: id })
+      .delete()
+      .then(() => db.lines.delete(id).catch(onError))
+      .catch(onError),
+  );
+};
+
+export const deleteResource = async (id: number, onError: (e: Error) => void) =>
+  db.resources.delete(id).catch(onError);

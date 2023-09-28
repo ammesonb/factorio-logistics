@@ -44,7 +44,16 @@ export const AddModal = ({
       </Modal.Header>
       <Modal.Body>
         <h6>Name:</h6>
-        <Input size="lg" onChange={setName} />
+        <Input
+          size="lg"
+          autoFocus
+          onChange={setName}
+          onKeyUp={(e) => {
+            if (e.key === "Enter" || e.key === "Return" || e.keyCode === 13) {
+              save();
+            }
+          }}
+        />
         {type === "category" && (
           <>
             <br />
