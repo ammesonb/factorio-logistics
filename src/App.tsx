@@ -6,7 +6,7 @@ import { Category, db, Line, Surface } from "./db/DB";
 import { Surfaces } from "./Surfaces";
 
 const App = () => {
-  const [dataLoaded, setDataLoaded] = useState<boolean>(true);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
   const rawData = {
     surfaces: useLiveQuery(() => db.surfaces.toArray(), [], []),

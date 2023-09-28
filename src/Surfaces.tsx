@@ -14,7 +14,6 @@ export const Surfaces = ({
 
   return (
     <Sidenav expanded={expanded} defaultOpenKeys={["Nauvis"]}>
-      <Sidenav.Toggle onToggle={setExpand} />
       <Sidenav.Body>
         <Nav>
           {surfaces.map((surface) =>
