@@ -28,6 +28,7 @@ import {
   ILine,
   ISurface,
   Item,
+  Line,
   LINE,
   parseDBData,
   RESOURCE,
@@ -36,6 +37,7 @@ import {
   Surface,
 } from "./db/DB";
 import { DeleteModal } from "./DeleteModal";
+import { LineDetail } from "./LineDetail";
 import { Resources } from "./Resources";
 import { SurfaceDetail } from "./SurfaceDetail";
 import { Surfaces } from "./Surfaces";
@@ -105,6 +107,16 @@ const App = () => {
     surfaces.forEach((surface) =>
       surface.categories.forEach(
         (category) => (byID[category.id as number] = category),
+      ),
+    );
+    return byID;
+  }, [surfaces]);
+
+  const linesByID = useMemo(() => {
+    const byID: { [key: number]: Line } = {};
+    surfaces.forEach((surface) =>
+      surface.categories.forEach((category) =>
+        category.lines.forEach((line) => (byID[line.id as number] = line)),
       ),
     );
     return byID;
@@ -234,6 +246,18 @@ const App = () => {
             onAdd={openAddDialog}
             onDelete={openDeleteDialog}
             onPageChange={changePage}
+          />
+        );
+      }
+    } else if (pageType === LINE) {
+      const line = linesByID[pageID as number];
+      if (line) {
+        return (
+          <LineDetail
+            line={line}
+            onAdd={openAddDialog}
+            onDelete={openDeleteDialog}
+            // onPageChange={changePage}
           />
         );
       }
