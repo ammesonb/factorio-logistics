@@ -1,4 +1,4 @@
-import { Table, Trash } from "@rsuite/icons";
+import { PageNext, Table, TableColumn, Trash } from "@rsuite/icons";
 import { Divider, IconButton, List, Panel, PanelGroup, Stack } from "rsuite";
 import { CATEGORY, LINE, SURFACE, Surface } from "./db/DB";
 
@@ -47,7 +47,40 @@ export const SurfaceDetail = ({
           <Panel
             key={`category-${category.id}`}
             eventKey={category.id}
-            header={category.name}
+            header={
+              <Stack direction="row" style={{ marginRight: "3%" }} spacing={12}>
+                <h4>{category.name}</h4>
+                <Stack.Item grow={1} />
+                <IconButton
+                  icon={<TableColumn />}
+                  appearance="primary"
+                  color="green"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAdd(LINE, category.id as number);
+                  }}
+                >
+                  Add line
+                </IconButton>
+                <IconButton
+                  icon={<Trash />}
+                  appearance="primary"
+                  color="red"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(CATEGORY, category.id as number, category.name);
+                  }}
+                >
+                  Delete category
+                </IconButton>
+                <IconButton
+                  icon={<PageNext />}
+                  onClick={() => onPageChange(CATEGORY, category.id as number)}
+                >
+                  View
+                </IconButton>
+              </Stack>
+            }
           >
             {category.lines.length > 0 && (
               <List bordered>
@@ -56,7 +89,19 @@ export const SurfaceDetail = ({
                     key={`line-${line.id}`}
                     onClick={() => onPageChange(LINE, line.id as number)}
                   >
-                    {line.name}
+                    <Stack direction="row">
+                      {line.name}
+                      <Stack.Item grow={1} />
+                      <IconButton
+                        icon={<Trash />}
+                        appearance="primary"
+                        color="red"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(LINE, line.id as number, line.name);
+                        }}
+                      />
+                    </Stack>
                   </List.Item>
                 ))}
               </List>
