@@ -1,3 +1,4 @@
+import { CloseOutline } from "@rsuite/icons";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -5,6 +6,7 @@ import {
   Container,
   Content,
   Header,
+  IconButton,
   InputPicker,
   Message,
   Sidebar,
@@ -35,6 +37,7 @@ import {
 } from "./db/DB";
 import { DeleteModal } from "./DeleteModal";
 import { Resources } from "./Resources";
+import { SurfaceDetail } from "./SurfaceDetail";
 import { Surfaces } from "./Surfaces";
 
 const App = () => {
@@ -192,6 +195,40 @@ const App = () => {
     onComplete();
   };
 
+  const [pageType, setPageType] = useState("surface");
+  const [pageID, setPageID] = useState<string | number>("Nauvis");
+
+  const changePage = useMemo(
+    () => (pageType: string, pageID: string | number) => {
+      setPageType(pageType);
+      setPageID(pageID);
+    },
+    [setPageID, setPageType],
+  );
+
+  const pageBody = useMemo(() => {
+    // Don't try to load a page until data has been loaded
+    if (!dataLoaded || surfaces.length === 0) {
+      return;
+    }
+
+    if (pageType === SURFACE) {
+      const entity = surfaces.filter((surface) => surface.name === pageID);
+      if (entity.length > 0) {
+        return (
+          <SurfaceDetail
+            surface={entity[0] as Surface}
+            onAdd={openAddDialog}
+            onDelete={openDeleteDialog}
+            onPageChange={changePage}
+          />
+        );
+      }
+    }
+
+    setError(`Could not find ${pageType} with ID ${pageID}`);
+  }, [dataLoaded, surfaces, pageID, pageType]);
+
   return dataLoaded ? (
     <Container>
       <Header style={{ marginBottom: "1%" }}>
@@ -232,13 +269,24 @@ const App = () => {
         <Sidebar width={320}>
           <Surfaces
             surfaces={surfaces}
-            onPageChange={() => {}}
+            onPageChange={changePage}
             onAdd={openAddDialog}
             onDelete={openDeleteDialog}
           />
         </Sidebar>
         <Content style={{ padding: "0px 2% 0px 2%" }}>
-          {error !== "" && <Message type="error">{error}</Message>}
+          {error !== "" && (
+            <Message type="error">
+              <Stack direction="row">
+                {error}
+                <Stack.Item grow={1} />
+                <IconButton
+                  icon={<CloseOutline />}
+                  onClick={() => setError("")}
+                />
+              </Stack>
+            </Message>
+          )}
           <AddModal
             type={addType}
             parent={addParent}
@@ -252,12 +300,13 @@ const App = () => {
             onDelete={deleteEntry}
             onClose={() => setDeleteType("")}
           />
+          {pageBody}
         </Content>
         <Sidebar>
           <Resources
             items={itemsByID}
             resources={resourcesSeen}
-            onPageChange={() => {}}
+            onPageChange={changePage}
           />
         </Sidebar>
       </Container>

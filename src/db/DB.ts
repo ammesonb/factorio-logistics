@@ -71,6 +71,7 @@ export interface Surface {
 
 export interface Category {
   id?: number;
+  surface: string;
   name: string;
   mostlyConsumes: boolean;
   lines: Line[];
@@ -78,6 +79,7 @@ export interface Category {
 
 export interface Line {
   id?: number;
+  categoryID: number;
   name: string;
   resources: Resource[];
 }
@@ -113,6 +115,16 @@ export const parseDBData = (
   rawResources.forEach((dbRes) => {
     linesByID[dbRes.lineID].resources.push(dbRes);
   });
+
+  s.forEach((surface: Surface) => {
+    surface.categories.forEach((category) => {
+      category.lines.sort((l1, l2) => (l1.name > l2.name ? 1 : -1));
+    });
+    surface.categories.sort((c1: Category, c2: Category) =>
+      c1.name > c2.name ? 1 : -1,
+    );
+  });
+
   return s;
 };
 
