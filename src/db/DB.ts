@@ -173,6 +173,39 @@ export const analyzeResourceUsage = (
   };
 };
 
+export const add = (
+  type: string,
+  parent: string | number,
+  name: string,
+  onComplete: () => void,
+  setError: (text: string) => void,
+  mostlyConsumes?: boolean,
+) => {
+  switch (type) {
+    case SURFACE:
+      db.surfaces
+        .add({ name })
+        .catch((e) => setError(`Failed to add surface: ${e}`));
+      break;
+    case CATEGORY:
+      db.categories
+        .add({
+          name,
+          surface: parent as string,
+          mostlyConsumes: mostlyConsumes ?? true,
+        })
+        .catch((e) => setError(`Failed to add category: ${e}`));
+      break;
+    case LINE:
+      db.lines
+        .add({ name, categoryID: parent as number })
+        .catch((e) => setError(`Failed to add line: ${e}`));
+      break;
+  }
+
+  onComplete();
+};
+
 export const addSurface = (name: string) => db.surfaces.add({ name });
 
 export const addCategory = (
@@ -189,6 +222,35 @@ export const addResource = (
   item: string,
   isConsumed: boolean,
 ) => db.resources.add({ lineID, item, isConsumed, quantityPerSec: 0 });
+
+export const deleteEntry = (
+  type: string,
+  id: string | number,
+  onComplete: () => void,
+  setError: (error: string) => void,
+) => {
+  switch (type) {
+    case SURFACE:
+      deleteSurface(id as string, (e) =>
+        setError(`Failed to remove surface: ${e}`),
+      );
+      break;
+    case CATEGORY:
+      deleteCategory(id as number, (e) =>
+        setError(`Failed to remove category: ${e}`),
+      );
+      break;
+    case LINE:
+      deleteLine(id as number, (e) => setError(`Failed to remove line: ${e}`));
+      break;
+    case RESOURCE:
+      deleteResource(id as number, (e) =>
+        setError(`Failed to remove resource: ${e}`),
+      );
+  }
+
+  onComplete();
+};
 
 export const deleteSurface = async (
   name: string,

@@ -6,7 +6,13 @@ export const ViewButton = ({
 }: {
   onClick: (e: React.MouseEvent<HTMLElement>) => void;
 }) => (
-  <IconButton icon={<PageNext />} onClick={onClick}>
+  <IconButton
+    icon={<PageNext />}
+    onClick={(e) => {
+      e.stopPropagation();
+      onClick(e);
+    }}
+  >
     View
   </IconButton>
 );

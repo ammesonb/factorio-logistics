@@ -1,4 +1,9 @@
-import { CloseOutline } from "@rsuite/icons";
+import {
+  ArrowLeftLine,
+  ArrowRightLine,
+  CloseOutline,
+  History,
+} from "@rsuite/icons";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -16,14 +21,12 @@ import { AddModal } from "./AddModal";
 import { CategoryDetail } from "./CategoryDetail";
 import { DataLoader } from "./DataLoader";
 import {
+  add,
   analyzeResourceUsage,
   Category,
   CATEGORY,
   db,
-  deleteCategory,
-  deleteLine,
-  deleteResource,
-  deleteSurface,
+  deleteEntry,
   ICategory,
   ILine,
   ISurface,
@@ -31,7 +34,6 @@ import {
   Line,
   LINE,
   parseDBData,
-  RESOURCE,
   Resource,
   SURFACE,
   Surface,
@@ -41,6 +43,12 @@ import { LineDetail } from "./LineDetail";
 import { Resources } from "./Resources";
 import { SurfaceDetail } from "./SurfaceDetail";
 import { Surfaces } from "./Surfaces";
+
+interface History {
+  type: string;
+  id: string | number;
+  current: boolean;
+}
 
 const App = () => {
   const [error, setError] = useState("");
@@ -133,38 +141,6 @@ const App = () => {
     [setAddType, setAddParent],
   );
 
-  const add = (
-    type: string,
-    parent: string | number,
-    name: string,
-    onComplete: () => void,
-    mostlyConsumes?: boolean,
-  ) => {
-    switch (type) {
-      case SURFACE:
-        db.surfaces
-          .add({ name })
-          .catch((e) => setError(`Failed to add surface: ${e}`));
-        break;
-      case CATEGORY:
-        db.categories
-          .add({
-            name,
-            surface: parent as string,
-            mostlyConsumes: mostlyConsumes ?? true,
-          })
-          .catch((e) => setError(`Failed to add category: ${e}`));
-        break;
-      case LINE:
-        db.lines
-          .add({ name, categoryID: parent as number })
-          .catch((e) => setError(`Failed to add line: ${e}`));
-        break;
-    }
-
-    onComplete();
-  };
-
   const [deleteType, setDeleteType] = useState("");
   const [deleteID, setDeleteID] = useState<string | number>("");
   const [deleteName, setDeleteName] = useState("");
@@ -178,45 +154,55 @@ const App = () => {
     [setDeleteType, setDeleteID, setDeleteName],
   );
 
-  const deleteEntry = (
-    type: string,
-    id: string | number,
-    onComplete: () => void,
-  ) => {
-    switch (type) {
-      case SURFACE:
-        deleteSurface(id as string, (e) =>
-          setError(`Failed to remove surface: ${e}`),
-        );
-        break;
-      case CATEGORY:
-        deleteCategory(id as number, (e) =>
-          setError(`Failed to remove category: ${e}`),
-        );
-        break;
-      case LINE:
-        deleteLine(id as number, (e) =>
-          setError(`Failed to remove line: ${e}`),
-        );
-        break;
-      case RESOURCE:
-        deleteResource(id as number, (e) =>
-          setError(`Failed to remove resource: ${e}`),
-        );
-    }
+  const [history, setHistory] = useState<History[]>([
+    { type: SURFACE, id: "Nauvis", current: true },
+  ]);
 
-    onComplete();
-  };
+  const goBack = useMemo(
+    () => () =>
+      setHistory((history) => {
+        const currentIndex = history.map((h) => h.current).indexOf(true);
+        let newIndex = currentIndex - 1;
+        newIndex = newIndex < 0 ? 0 : newIndex;
+        return history.map((h, i) => ({
+          ...h,
+          current: i === newIndex,
+        }));
+      }),
+    [setHistory],
+  );
+  const goForward = useMemo(
+    () => () =>
+      setHistory((history) => {
+        const currentIndex = history.map((h) => h.current).indexOf(true);
+        let newIndex = currentIndex + 1;
+        newIndex = newIndex < history.length ? newIndex : history.length - 1;
+        return history.map((h, i) => ({
+          ...h,
+          current: i === newIndex,
+        }));
+      }),
+    [setHistory],
+  );
 
-  const [pageType, setPageType] = useState("surface");
-  const [pageID, setPageID] = useState<string | number>("Nauvis");
-
-  const changePage = useMemo(
-    () => (pageType: string, pageID: string | number) => {
-      setPageType(pageType);
-      setPageID(pageID);
+  const navigate = useMemo(
+    () => (pageType: string, pageID: number | string) => {
+      // When navigating, strip anything forwards of where we are now to prevent
+      // weird split-path from occurring
+      const currentIndex = history.map((h) => h.current).indexOf(true);
+      setHistory([
+        ...history
+          .slice(0, currentIndex + 1)
+          .map((h) => ({ ...h, current: false })),
+        { type: pageType, id: pageID, current: true },
+      ]);
     },
-    [setPageID, setPageType],
+    [history, setHistory],
+  );
+
+  const currentPage = useMemo(
+    () => history.filter((h) => h.current)[0],
+    [history],
   );
 
   const pageBody = useMemo(() => {
@@ -225,52 +211,65 @@ const App = () => {
       return;
     }
 
-    if (pageType === SURFACE) {
-      const entity = surfaces.filter((surface) => surface.name === pageID);
+    if (currentPage.type === SURFACE) {
+      const entity = surfaces.filter(
+        (surface) => surface.name === currentPage.id,
+      );
       if (entity.length > 0) {
         return (
           <SurfaceDetail
             surface={entity[0] as Surface}
             onAdd={openAddDialog}
             onDelete={openDeleteDialog}
-            onPageChange={changePage}
+            onPageChange={navigate}
           />
         );
       }
-    } else if (pageType === CATEGORY) {
-      const category = categoriesByID[pageID as number];
+    } else if (currentPage.type === CATEGORY) {
+      const category = categoriesByID[currentPage.id as number];
       if (category) {
         return (
           <CategoryDetail
             category={category}
             onAdd={openAddDialog}
             onDelete={openDeleteDialog}
-            onPageChange={changePage}
+            onPageChange={navigate}
           />
         );
       }
-    } else if (pageType === LINE) {
-      const line = linesByID[pageID as number];
+    } else if (currentPage.type === LINE) {
+      const line = linesByID[currentPage.id as number];
       if (line) {
         return (
           <LineDetail
             line={line}
             onAdd={openAddDialog}
             onDelete={openDeleteDialog}
-            // onPageChange={changePage}
+            // onPageChange={navigate}
           />
         );
       }
     }
 
-    setError(`Could not find ${pageType} with ID ${pageID}`);
-  }, [dataLoaded, surfaces, pageID, pageType]);
+    setError(`Could not find ${currentPage.type} with ID ${currentPage.id}`);
+  }, [dataLoaded, surfaces, currentPage]);
 
   return dataLoaded ? (
     <Container>
       <Header style={{ marginBottom: "1%" }}>
         <Stack direction="row" spacing={12}>
           <h2>Factorio Logistics</h2>
+          <Stack.Item grow={1} />
+          <IconButton
+            icon={<ArrowLeftLine />}
+            onClick={goBack}
+            disabled={history[0].current}
+          />
+          <IconButton
+            icon={<ArrowRightLine />}
+            onClick={goForward}
+            disabled={history[history.length - 1].current}
+          />
           <Stack.Item style={{ marginLeft: "3%" }}>
             <h5>Time&nbsp;unit:</h5>
           </Stack.Item>
@@ -286,7 +285,7 @@ const App = () => {
               onChange={(unit) => setTimeUnit(unit)}
             />
           </Stack.Item>
-          <Stack.Item grow={1} />
+          <Stack.Item grow={3} />
           <Button
             appearance="primary"
             color="cyan"
@@ -306,7 +305,7 @@ const App = () => {
         <Sidebar width={320}>
           <Surfaces
             surfaces={surfaces}
-            onPageChange={changePage}
+            onPageChange={navigate}
             onAdd={openAddDialog}
             onDelete={openDeleteDialog}
           />
@@ -327,14 +326,24 @@ const App = () => {
           <AddModal
             type={addType}
             parent={addParent}
-            onAdd={add}
+            onAdd={(
+              type: string,
+              parent: string | number,
+              name: string,
+              onComplete: () => void,
+              mostlyConsumes?: boolean,
+            ) => add(type, parent, name, onComplete, setError, mostlyConsumes)}
             onClose={() => setAddType("")}
           />
           <DeleteModal
             type={deleteType}
             id={deleteID}
             name={deleteName}
-            onDelete={deleteEntry}
+            onDelete={(
+              type: string,
+              id: string | number,
+              onComplete: () => void,
+            ) => deleteEntry(type, id, onComplete, setError)}
             onClose={() => setDeleteType("")}
           />
           {pageBody}
@@ -343,7 +352,7 @@ const App = () => {
           <Resources
             items={itemsByID}
             resources={resourcesSeen}
-            onPageChange={changePage}
+            onPageChange={navigate}
           />
         </Sidebar>
       </Container>
