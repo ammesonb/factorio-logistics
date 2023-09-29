@@ -1,17 +1,17 @@
-import { Table, TableColumn } from "@rsuite/icons";
+import { AdvancedAnalytics, TableColumn } from "@rsuite/icons";
 import { Divider, List, Panel, PanelGroup, Stack } from "rsuite";
-import { CATEGORY, LINE, SURFACE, Surface } from "./db/DB";
+import { CATEGORY, LINE, Category, RESOURCE } from "./db/DB";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
 import { ViewButton } from "./wrappers/ViewButton";
 
-export const SurfaceDetail = ({
-  surface,
+export const CategoryDetail = ({
+  category,
   onAdd,
   onDelete,
   onPageChange,
 }: {
-  surface: Surface;
+  category: Category;
   onAdd: (type: string, parent: string | number) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
   onPageChange: (pageType: string, pageID: string | number) => void;
@@ -22,66 +22,69 @@ export const SurfaceDetail = ({
       header={
         <>
           <Stack direction="row" spacing={12}>
-            <h3>{surface.name}</h3>
+            <h3>{category.name}</h3>
             <Stack.Item grow={1} />
             <AddButton
-              icon={Table}
-              text="Add category"
-              onClick={() => onAdd(CATEGORY, surface.name)}
+              icon={TableColumn}
+              text="Add line"
+              onClick={() => onAdd(LINE, category.id as number)}
             />
             <DeleteButton
-              text="Delete surface"
-              onClick={() => onDelete(SURFACE, surface.name, surface.name)}
+              text="Delete category"
+              onClick={() =>
+                onDelete(CATEGORY, category.id as number, category.name)
+              }
             />
           </Stack>
           <Divider />
         </>
       }
     >
-      <PanelGroup accordion defaultActiveKey={surface.categories[0]?.id}>
-        {surface.categories.map((category) => (
+      <PanelGroup accordion defaultActiveKey={category.lines[0]?.id}>
+        {category.lines.map((line) => (
           <Panel
-            key={`category-${category.id}`}
-            eventKey={category.id}
+            key={`line-${line.id}`}
+            eventKey={line.id}
             header={
               <Stack direction="row" style={{ marginRight: "3%" }} spacing={12}>
-                <h4>{category.name}</h4>
+                <h4>{line.name}</h4>
                 <Stack.Item grow={1} />
                 <AddButton
-                  icon={TableColumn}
-                  text="Add line"
+                  icon={AdvancedAnalytics}
+                  text="Add resource"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAdd(LINE, category.id as number);
+                    onAdd(LINE, line.id as number);
                   }}
                 />
                 <DeleteButton
-                  text="Delete category"
+                  text="Delete line"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(CATEGORY, category.id as number, category.name);
+                    onDelete(LINE, line.id as number, line.name);
                   }}
                 />
                 <ViewButton
-                  onClick={() => onPageChange(CATEGORY, category.id as number)}
+                  onClick={() => onPageChange(LINE, line.id as number)}
                 />
               </Stack>
             }
           >
-            {category.lines.length > 0 && (
+            {line.resources.length > 0 && (
               <List bordered>
-                {category.lines.map((line) => (
-                  <List.Item
-                    key={`line-${line.id}`}
-                    onClick={() => onPageChange(LINE, line.id as number)}
-                  >
+                {line.resources.map((resource) => (
+                  <List.Item key={`resource-${resource.id}`}>
                     <Stack direction="row">
-                      {line.name}
+                      {resource.item}
                       <Stack.Item grow={1} />
                       <DeleteButton
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDelete(LINE, line.id as number, line.name);
+                          onDelete(
+                            RESOURCE,
+                            resource.id as number,
+                            resource.item,
+                          );
                         }}
                       />
                     </Stack>

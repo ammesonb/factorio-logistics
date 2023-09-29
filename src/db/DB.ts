@@ -142,17 +142,23 @@ export const memoizeLines = (lines: ILine[]): { [key: number]: ILine } => {
   return byID;
 };
 
-export const analyzeResourceUsage = (rawResources: Resource[]) => {
+export const analyzeResourceUsage = (
+  rawResources: Resource[],
+): {
+  resourceProductionRates: { [key: string]: number };
+  resourcesSeen: Resource[];
+  linesByResource: { [key: string]: number[] };
+} => {
   // Calculate each resource's production/consumption
-  const byName: { [key: string]: number } = {};
+  const resourceProductionRates: { [key: string]: number } = {};
   // Track each unique resource seen in the lines
   const resourcesSeen: Set<Resource> = new Set();
   // Track each line where a resource is produced or consumed
   const linesByResource: { [key: string]: number[] } = {};
   rawResources.forEach((resource) => {
     resourcesSeen.add(resource);
-    byName[resource.item] =
-      byName?.[resource.item] +
+    resourceProductionRates[resource.item] =
+      resourceProductionRates?.[resource.item] +
       (resource.isConsumed ? -1 : 1) * resource.quantityPerSec;
     linesByResource[resource.item] = [
       ...(linesByResource?.[resource.item] || []),
@@ -160,7 +166,11 @@ export const analyzeResourceUsage = (rawResources: Resource[]) => {
     ];
   });
 
-  return { byName, resourcesSeen: Array.from(resourcesSeen), linesByResource };
+  return {
+    resourceProductionRates,
+    resourcesSeen: Array.from(resourcesSeen),
+    linesByResource,
+  };
 };
 
 export const addSurface = (name: string) => db.surfaces.add({ name });

@@ -13,9 +13,11 @@ import {
   Stack,
 } from "rsuite";
 import { AddModal } from "./AddModal";
+import { CategoryDetail } from "./CategoryDetail";
 import { DataLoader } from "./DataLoader";
 import {
   analyzeResourceUsage,
+  Category,
   CATEGORY,
   db,
   deleteCategory,
@@ -27,8 +29,6 @@ import {
   ISurface,
   Item,
   LINE,
-  // memoizeCategories,
-  // memoizeLines,
   parseDBData,
   RESOURCE,
   Resource,
@@ -95,19 +95,20 @@ const App = () => {
   );
 
   const {
-    // byID: resourceProduction,
+    // resourceProductionRates,
     resourcesSeen,
     // linesByResource,
   } = useMemo(() => analyzeResourceUsage(rawResources), [rawResources]);
 
-  /*
-  const categoriesByID = useMemo(
-    () => memoizeCategories(rawCategories),
-    [rawCategories],
-  );
-
-  const linesByID = useMemo(() => memoizeLines(rawLines), [rawLines]);
-   */
+  const categoriesByID = useMemo(() => {
+    const byID: { [key: number]: Category } = {};
+    surfaces.forEach((surface) =>
+      surface.categories.forEach(
+        (category) => (byID[category.id as number] = category),
+      ),
+    );
+    return byID;
+  }, [surfaces]);
 
   const [addType, setAddType] = useState("");
   const [addParent, setAddParent] = useState<string | number>("");
@@ -218,6 +219,18 @@ const App = () => {
         return (
           <SurfaceDetail
             surface={entity[0] as Surface}
+            onAdd={openAddDialog}
+            onDelete={openDeleteDialog}
+            onPageChange={changePage}
+          />
+        );
+      }
+    } else if (pageType === CATEGORY) {
+      const category = categoriesByID[pageID as number];
+      if (category) {
+        return (
+          <CategoryDetail
+            category={category}
             onAdd={openAddDialog}
             onDelete={openDeleteDialog}
             onPageChange={changePage}

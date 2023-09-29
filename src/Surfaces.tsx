@@ -1,8 +1,10 @@
-import { Divider, IconButton, Nav, Sidenav, Stack } from "rsuite";
+import { Divider, Nav, Sidenav, Stack } from "rsuite";
 import { Category, CATEGORY, LINE, Line, SURFACE, Surface } from "./db/DB";
-import { Global, Icon, Table, TableColumn, Trash } from "@rsuite/icons";
+import { Global, Icon, Table, TableColumn } from "@rsuite/icons";
 import { ForwardRefExoticComponent, useState } from "react";
 import { IconProps } from "@rsuite/icons/lib/Icon";
+import { DeleteButton } from "./wrappers/DeleteButton";
+import { AddButton } from "./wrappers/AddButton";
 
 const generateSurfaceMenu = (
   surface: Surface,
@@ -179,20 +181,15 @@ const generateButtons = (
       </Stack.Item>
       <Stack.Item grow={1} />
       {HIERARCHY[type] && (
-        <IconButton
-          appearance="primary"
-          color="green"
-          icon={<Icon as={HIERARCHY[type].childIcon} />}
+        <AddButton
+          icon={HIERARCHY[type].childIcon}
           onClick={(e) => {
             e.stopPropagation();
             onAdd(HIERARCHY[type].child, id);
           }}
         />
       )}
-      <IconButton
-        appearance="primary"
-        color="red"
-        icon={<Trash />}
+      <DeleteButton
         onClick={(e) => {
           e.stopPropagation();
           onDelete(type, id, obj.name);
@@ -228,14 +225,11 @@ export const Surfaces = ({
             <h3>Surfaces</h3>
           </Stack.Item>
           <Stack.Item>
-            <IconButton
-              icon={<Global />}
-              appearance="primary"
-              color="green"
+            <AddButton
+              text="Add"
+              icon={Global}
               onClick={() => onAdd(SURFACE, "")}
-            >
-              Add
-            </IconButton>
+            />
           </Stack.Item>
         </Stack>
       </Sidenav.Header>
