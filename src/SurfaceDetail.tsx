@@ -3,16 +3,19 @@ import { Divider, List, Panel, PanelGroup, Stack } from "rsuite";
 import { CATEGORY, LINE, SURFACE, Surface } from "./db/DB";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
+import { RenameButton } from "./wrappers/RenameButton";
 import { ViewButton } from "./wrappers/ViewButton";
 
 export const SurfaceDetail = ({
   surface,
   onAdd,
+  onRename,
   onDelete,
   onPageChange,
 }: {
   surface: Surface;
   onAdd: (type: string, parent: string | number) => void;
+  onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
   onPageChange: (pageType: string, pageID: string | number) => void;
 }) => {
@@ -22,6 +25,9 @@ export const SurfaceDetail = ({
       header={
         <>
           <Stack direction="row" spacing={12}>
+            <RenameButton
+              onRename={() => onRename(SURFACE, surface.name, surface.name)}
+            />
             <h3>{surface.name}</h3>
             <Stack.Item grow={1} />
             <AddButton
@@ -45,6 +51,11 @@ export const SurfaceDetail = ({
             eventKey={category.id}
             header={
               <Stack direction="row" style={{ marginRight: "3%" }} spacing={12}>
+                <RenameButton
+                  onRename={() =>
+                    onRename(CATEGORY, category.id as number, category.name)
+                  }
+                />
                 <h4>{category.name}</h4>
                 <Stack.Item grow={1} />
                 <AddButton
@@ -75,7 +86,12 @@ export const SurfaceDetail = ({
                     key={`line-${line.id}`}
                     onClick={() => onPageChange(LINE, line.id as number)}
                   >
-                    <Stack direction="row">
+                    <Stack direction="row" spacing={12}>
+                      <RenameButton
+                        onRename={() =>
+                          onRename(LINE, line.id as number, line.name)
+                        }
+                      />
                       {line.name}
                       <Stack.Item grow={1} />
                       <DeleteButton

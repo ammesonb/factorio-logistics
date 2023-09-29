@@ -1,19 +1,29 @@
 import { AdvancedAnalytics, TableColumn } from "@rsuite/icons";
 import { Divider, List, Panel, PanelGroup, Stack } from "rsuite";
-import { CATEGORY, LINE, Category, RESOURCE } from "./db/DB";
+import { CATEGORY, LINE, Category, Item } from "./db/DB";
+import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
+import { RenameButton } from "./wrappers/RenameButton";
 import { ViewButton } from "./wrappers/ViewButton";
 
 export const CategoryDetail = ({
   category,
   onAdd,
+  onRename,
   onDelete,
+  itemsByID,
+  updateResourceQuantity,
+  updateResourceConsumed,
   onPageChange,
 }: {
   category: Category;
   onAdd: (type: string, parent: string | number) => void;
+  onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
+  itemsByID: { [key: string]: Item };
+  updateResourceQuantity: (resourceID: number, quantityPerSec: number) => void;
+  updateResourceConsumed: (resourceID: number, isConsumed: boolean) => void;
   onPageChange: (pageType: string, pageID: string | number) => void;
 }) => {
   return (
@@ -22,6 +32,11 @@ export const CategoryDetail = ({
       header={
         <>
           <Stack direction="row" spacing={12}>
+            <RenameButton
+              onRename={() =>
+                onRename(CATEGORY, category.id as number, category.name)
+              }
+            />
             <h3>{category.name}</h3>
             <Stack.Item grow={1} />
             <AddButton
@@ -47,6 +62,9 @@ export const CategoryDetail = ({
             eventKey={line.id}
             header={
               <Stack direction="row" style={{ marginRight: "3%" }} spacing={12}>
+                <RenameButton
+                  onRename={() => onRename(LINE, line.id as number, line.name)}
+                />
                 <h4>{line.name}</h4>
                 <Stack.Item grow={1} />
                 <AddButton
@@ -74,20 +92,13 @@ export const CategoryDetail = ({
               <List bordered>
                 {line.resources.map((resource) => (
                   <List.Item key={`resource-${resource.id}`}>
-                    <Stack direction="row">
-                      {resource.item}
-                      <Stack.Item grow={1} />
-                      <DeleteButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(
-                            RESOURCE,
-                            resource.id as number,
-                            resource.item,
-                          );
-                        }}
-                      />
-                    </Stack>
+                    <ResourceRow
+                      resource={resource}
+                      itemsByID={itemsByID}
+                      updateQuantity={updateResourceQuantity}
+                      updateConsumed={updateResourceConsumed}
+                      onDelete={onDelete}
+                    />
                   </List.Item>
                 ))}
               </List>

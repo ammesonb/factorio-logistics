@@ -21,7 +21,7 @@ export interface ICategory {
   id?: number;
   surface: string;
   name: string;
-  mostlyConsumes: boolean;
+  mostlyConsumed: boolean;
 }
 
 export interface ILine {
@@ -73,7 +73,7 @@ export interface Category {
   id?: number;
   surface: string;
   name: string;
-  mostlyConsumes: boolean;
+  mostlyConsumed: boolean;
   lines: Line[];
 }
 
@@ -179,7 +179,7 @@ export const add = (
   name: string,
   onComplete: () => void,
   setError: (text: string) => void,
-  mostlyConsumes?: boolean,
+  mostlyConsumed?: boolean,
 ) => {
   switch (type) {
     case SURFACE:
@@ -192,7 +192,7 @@ export const add = (
         .add({
           name,
           surface: parent as string,
-          mostlyConsumes: mostlyConsumes ?? true,
+          mostlyConsumed: mostlyConsumed ?? true,
         })
         .catch((e) => setError(`Failed to add category: ${e}`));
       break;
@@ -211,8 +211,8 @@ export const addSurface = (name: string) => db.surfaces.add({ name });
 export const addCategory = (
   name: string,
   surface: string,
-  mostlyConsumes: boolean,
-) => db.categories.add({ name, surface, mostlyConsumes });
+  mostlyConsumed: boolean,
+) => db.categories.add({ name, surface, mostlyConsumed });
 
 export const addLine = (name: string, categoryID: number) =>
   db.lines.add({ name, categoryID });
@@ -222,6 +222,54 @@ export const addResource = (
   item: string,
   isConsumed: boolean,
 ) => db.resources.add({ lineID, item, isConsumed, quantityPerSec: 0 });
+
+export const updateResourceQuantity = (
+  resourceID: number,
+  quantityPerSec: number,
+  onError: (e: string) => void,
+) => {
+  db.resources
+    .update(resourceID, { quantityPerSec })
+    .catch((e) => onError(`Failed to update resource quantity: ${e}`));
+};
+
+export const updateResourceConsumed = (
+  resourceID: number,
+  isConsumed: boolean,
+  onError: (e: string) => void,
+) => {
+  db.resources
+    .update(resourceID, { mostlyConsumed: isConsumed })
+    .catch((e) => onError(`Failed to update resource quantity: ${e}`));
+};
+
+export const renameEntry = (
+  type: string,
+  id: string | number,
+  name: string,
+  onComplete: () => void,
+  setError: (error: string) => void,
+) => {
+  switch (type) {
+    case SURFACE:
+      db.surfaces
+        .update(id, { name })
+        .catch((e) => setError(`Failed to rename surface: ${e}`));
+      break;
+    case CATEGORY:
+      db.categories
+        .update(id, { name })
+        .catch((e) => setError(`Failed to rename category: ${e}`));
+      break;
+    case LINE:
+      db.lines
+        .update(id, { name })
+        .catch((e) => setError(`Failed to rename line: ${e}`));
+      break;
+  }
+
+  onComplete();
+};
 
 export const deleteEntry = (
   type: string,

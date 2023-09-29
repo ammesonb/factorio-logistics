@@ -1,17 +1,27 @@
 import { AdvancedAnalytics } from "@rsuite/icons";
 import { Divider, List, Panel, Stack } from "rsuite";
-import { LINE, Line, RESOURCE } from "./db/DB";
+import { Item, LINE, Line, RESOURCE } from "./db/DB";
+import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
+import { RenameButton } from "./wrappers/RenameButton";
 
 export const LineDetail = ({
   line,
   onAdd,
+  onRename,
   onDelete, // onPageChange,
+  itemsByID,
+  updateResourceQuantity,
+  updateResourceConsumed,
 }: {
   line: Line;
   onAdd: (type: string, parent: string | number) => void;
+  onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
+  itemsByID: { [key: string]: Item };
+  updateResourceQuantity: (resourceID: number, quantityPerSec: number) => void;
+  updateResourceConsumed: (resourceID: number, isConsumed: boolean) => void;
   // onPageChange: (pageType: string, pageID: string | number) => void;
 }) => {
   return (
@@ -20,6 +30,9 @@ export const LineDetail = ({
       header={
         <>
           <Stack direction="row" spacing={12}>
+            <RenameButton
+              onRename={() => onRename(LINE, line.id as number, line.name)}
+            />
             <h3>{line.name}</h3>
             <Stack.Item grow={1} />
             <AddButton
@@ -40,16 +53,13 @@ export const LineDetail = ({
         <List bordered>
           {line.resources.map((resource) => (
             <List.Item key={`resource-${resource.id}`}>
-              <Stack direction="row">
-                {resource.item}
-                <Stack.Item grow={1} />
-                <DeleteButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(RESOURCE, resource.id as number, resource.item);
-                  }}
-                />
-              </Stack>
+              <ResourceRow
+                resource={resource}
+                itemsByID={itemsByID}
+                updateQuantity={updateResourceQuantity}
+                updateConsumed={updateResourceConsumed}
+                onDelete={onDelete}
+              />
             </List.Item>
           ))}
         </List>

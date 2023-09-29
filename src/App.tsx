@@ -34,12 +34,16 @@ import {
   Line,
   LINE,
   parseDBData,
+  renameEntry,
   Resource,
   SURFACE,
   Surface,
+  updateResourceConsumed,
+  updateResourceQuantity,
 } from "./db/DB";
 import { DeleteModal } from "./DeleteModal";
 import { LineDetail } from "./LineDetail";
+import { RenameModal } from "./RenameModal";
 import { Resources } from "./Resources";
 import { SurfaceDetail } from "./SurfaceDetail";
 import { Surfaces } from "./Surfaces";
@@ -141,6 +145,19 @@ const App = () => {
     [setAddType, setAddParent],
   );
 
+  const [renameType, setRenameType] = useState("");
+  const [renameID, setRenameID] = useState<string | number>("");
+  const [renameName, setRenameName] = useState("");
+
+  const openRenameDialog = useMemo(
+    () => (type: string, id: string | number, currentName: string) => {
+      setRenameType(type);
+      setRenameID(id);
+      setRenameName(currentName);
+    },
+    [setAddType, setAddParent],
+  );
+
   const [deleteType, setDeleteType] = useState("");
   const [deleteID, setDeleteID] = useState<string | number>("");
   const [deleteName, setDeleteName] = useState("");
@@ -220,6 +237,7 @@ const App = () => {
           <SurfaceDetail
             surface={entity[0] as Surface}
             onAdd={openAddDialog}
+            onRename={openRenameDialog}
             onDelete={openDeleteDialog}
             onPageChange={navigate}
           />
@@ -232,7 +250,16 @@ const App = () => {
           <CategoryDetail
             category={category}
             onAdd={openAddDialog}
+            onRename={openRenameDialog}
             onDelete={openDeleteDialog}
+            itemsByID={itemsByID}
+            updateResourceQuantity={(
+              resourceID: number,
+              quantityPerSec: number,
+            ) => updateResourceQuantity(resourceID, quantityPerSec, setError)}
+            updateResourceConsumed={(resourceID: number, isConsumed: boolean) =>
+              updateResourceConsumed(resourceID, isConsumed, setError)
+            }
             onPageChange={navigate}
           />
         );
@@ -244,7 +271,16 @@ const App = () => {
           <LineDetail
             line={line}
             onAdd={openAddDialog}
+            onRename={openRenameDialog}
             onDelete={openDeleteDialog}
+            itemsByID={itemsByID}
+            updateResourceQuantity={(
+              resourceID: number,
+              quantityPerSec: number,
+            ) => updateResourceQuantity(resourceID, quantityPerSec, setError)}
+            updateResourceConsumed={(resourceID: number, isConsumed: boolean) =>
+              updateResourceConsumed(resourceID, isConsumed, setError)
+            }
             // onPageChange={navigate}
           />
         );
@@ -334,6 +370,18 @@ const App = () => {
               mostlyConsumes?: boolean,
             ) => add(type, parent, name, onComplete, setError, mostlyConsumes)}
             onClose={() => setAddType("")}
+          />
+          <RenameModal
+            type={renameType}
+            id={renameID}
+            currentName={renameName}
+            onRename={(
+              type: string,
+              id: string | number,
+              name: string,
+              onComplete: () => void,
+            ) => renameEntry(type, id, name, onComplete, setError)}
+            onClose={() => setRenameType("")}
           />
           <DeleteModal
             type={deleteType}
