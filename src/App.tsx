@@ -121,12 +121,6 @@ const App = () => {
     [rawSurfaces, rawCategories, rawLines, rawResources],
   );
 
-  const {
-    // resourceProductionRates,
-    resourcesSeen,
-    // linesByResource,
-  } = useMemo(() => analyzeResourceUsage(rawResources), [rawResources]);
-
   const categoriesByID = useMemo(() => {
     const byID: { [key: number]: Category } = {};
     surfaces.forEach((surface) =>
@@ -146,6 +140,15 @@ const App = () => {
     );
     return byID;
   }, [surfaces]);
+
+  const {
+    // resourceProductionRates,
+    itemsSeen,
+    linesByResource,
+  } = useMemo(
+    () => analyzeResourceUsage(rawResources, itemsByID, linesByID),
+    [rawResources, itemsByID, linesByID],
+  );
 
   const [addType, setAddType] = useState("");
   const [addParent, setAddParent] = useState<string | number>("");
@@ -321,8 +324,7 @@ const App = () => {
           // TODO: currently using resource instead of item
           // TODO: seen resources is using resources, not the item primitives
           item={itemsByID[currentPage.id as string]}
-          // TODO: this
-          lines={[]}
+          lines={linesByResource[currentPage.id as string]}
           onPageChange={navigate}
           items={rawItems}
           itemsByID={itemsByID}
@@ -453,11 +455,7 @@ const App = () => {
           {pageBody}
         </Content>
         <Sidebar>
-          <Resources
-            itemsByID={itemsByID}
-            resources={resourcesSeen}
-            onPageChange={navigate}
-          />
+          <Resources items={itemsSeen} onPageChange={navigate} />
         </Sidebar>
       </Container>
     </Container>

@@ -144,31 +144,33 @@ export const memoizeLines = (lines: ILine[]): { [key: number]: ILine } => {
 
 export const analyzeResourceUsage = (
   rawResources: Resource[],
+  itemsByID: { [key: string]: Item },
+  linesByID: { [key: number]: Line },
 ): {
   resourceProductionRates: { [key: string]: number };
-  resourcesSeen: Resource[];
-  linesByResource: { [key: string]: number[] };
+  itemsSeen: Item[];
+  linesByResource: { [key: string]: Line[] };
 } => {
   // Calculate each resource's production/consumption
   const resourceProductionRates: { [key: string]: number } = {};
   // Track each unique resource seen in the lines
-  const resourcesSeen: Set<Resource> = new Set();
+  const itemsSeen: Set<Item> = new Set();
   // Track each line where a resource is produced or consumed
-  const linesByResource: { [key: string]: number[] } = {};
+  const linesByResource: { [key: string]: Line[] } = {};
   rawResources.forEach((resource) => {
-    resourcesSeen.add(resource);
+    itemsSeen.add(itemsByID[resource.item]);
     resourceProductionRates[resource.item] =
       resourceProductionRates?.[resource.item] +
       (resource.isConsumed ? -1 : 1) * resource.quantityPerSec;
     linesByResource[resource.item] = [
       ...(linesByResource?.[resource.item] || []),
-      resource.lineID,
+      linesByID[resource.lineID],
     ];
   });
 
   return {
     resourceProductionRates,
-    resourcesSeen: Array.from(resourcesSeen),
+    itemsSeen: Array.from(itemsSeen),
     linesByResource,
   };
 };

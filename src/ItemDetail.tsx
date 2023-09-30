@@ -1,4 +1,4 @@
-import { Panel, Stack } from "rsuite";
+import { Divider, Panel, Stack } from "rsuite";
 import { Item, LINE, Line } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { ViewButton } from "./wrappers/ViewButton";
@@ -26,10 +26,13 @@ export const ItemDetail = ({
 }) => (
   <Panel
     header={
-      <Stack direction="row" spacing={12}>
-        <img src={item.icon} height={32} />
-        <h3>{item.name}</h3>
-      </Stack>
+      <>
+        <Stack direction="row" spacing={12}>
+          <img src={item.icon} height={32} />
+          <h3>{item.name}</h3>
+        </Stack>
+        <Divider />
+      </>
     }
   >
     {lines.map((line) => (
@@ -41,6 +44,9 @@ export const ItemDetail = ({
             <ViewButton onClick={() => onPageChange(LINE, line.id as number)} />
           </Stack>
         }
+        collapsible
+        defaultExpanded
+        bordered
       >
         {line.resources
           .filter((r) => r.item === item.internalName)

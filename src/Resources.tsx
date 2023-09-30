@@ -1,14 +1,12 @@
 import { Divider, Loader, Nav, Sidenav } from "rsuite";
-import { Item, Resource } from "./db/DB";
+import { Item } from "./db/DB";
 import { useState } from "react";
 
 export const Resources = ({
-  itemsByID,
-  resources,
+  items,
   onPageChange,
 }: {
-  itemsByID: { [key: string]: Item };
-  resources: Resource[];
+  items: Item[];
   onPageChange: (pageType: string, id: string) => void;
 }) => {
   const [active, setActive] = useState("");
@@ -20,31 +18,31 @@ export const Resources = ({
       </Sidenav.Header>
       <Divider />
       <Sidenav.Body>
-        {Object.keys(itemsByID).length === 0 ? (
+        {items.length === 0 || !items[0] ? (
           <Loader center inverse size="lg" />
         ) : (
           <Nav
             activeKey={active}
             onSelect={(eventKey: string) => {
               setActive(eventKey);
-              const [pageType, pageID] = eventKey.split("-", 2);
-              onPageChange(pageType, pageID);
+              const [pageType, ...pageID] = eventKey.split("-");
+              onPageChange(pageType, pageID.join("-"));
             }}
           >
-            {resources.map((resource) => (
+            {items.map((item) => (
               <Nav.Item
-                key={`resource-${resource.id}`}
-                eventKey={`surface-${resource.item}`}
+                key={`resource-${item.internalName}`}
+                eventKey={`resource-${item.internalName}`}
                 icon={
                   <img
-                    src={itemsByID[resource.item].icon}
+                    src={item.icon}
                     height={32}
                     style={{ marginRight: "3%" }}
                   />
                 }
                 style={{ paddingLeft: "8%" }}
               >
-                {itemsByID[resource.item].name}
+                {item.name}
               </Nav.Item>
             ))}
           </Nav>
