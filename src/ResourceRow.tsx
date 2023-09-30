@@ -34,13 +34,13 @@ export const ResourceRow = ({
     <h6>Quantity</h6>
     <Stack.Item basis="120px">
       <InputNumber
-        value={resource.quantityPerSec}
+        value={resource.quantityPerSec / timeUnit}
         onChange={(value: string | number) =>
           updateQuantity(
             resource.id as number,
-            typeof value === typeof "a"
+            (typeof value === typeof "a"
               ? parseFloat(value as string)
-              : (value as number),
+              : (value as number)) / timeUnit,
           )
         }
       />

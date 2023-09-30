@@ -1,4 +1,4 @@
-import { Divider, Panel, Stack } from "rsuite";
+import { Divider, Panel, Stack, Tag } from "rsuite";
 import { Item, LINE, Line } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { ViewButton } from "./wrappers/ViewButton";
@@ -25,35 +25,91 @@ export const ItemDetail = ({
   updateQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateConsumed: (resourceID: number, isConsumed: boolean) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
-}) => (
-  <Panel
-    header={
-      <>
-        <Stack direction="row" spacing={12}>
-          <img src={item.icon} height={32} />
-          <h3>{item.name}</h3>
-        </Stack>
-        <Divider />
-      </>
-    }
-  >
-    {lines.map((line) => (
-      <Panel
-        key={`line-${line.id}`}
-        header={
-          <Stack direction="row" style={{ marginRight: "3%" }}>
-            <h4>{line.name}</h4>
-            <Stack.Item grow={1} />
-            <ViewButton onClick={() => onPageChange(LINE, line.id as number)} />
-          </Stack>
+}) => {
+  let totalProduced = 0;
+  let totalConsumed = 0;
+
+  const filteredLines = lines.map((l) => ({
+    ...l,
+    resources: l.resources.filter((r) => {
+      if (r.item === item.internalName) {
+        if (r.isConsumed) {
+          totalConsumed += r.quantityPerSec;
+        } else {
+          totalProduced += r.quantityPerSec;
         }
-        collapsible
-        defaultExpanded
-        bordered
-      >
-        {line.resources
-          .filter((r) => r.item === item.internalName)
-          .map((resource) => (
+
+        return true;
+      }
+
+      return false;
+    }),
+  }));
+
+  const formatQuantity = (quantity: number): string =>
+    `${quantity.toFixed(3).replace(/0*$/, "").replace(/\.$/, "")}/${
+      { 1: "sec", 60: "min", 3600: "hour", 86400: "day" }[timeUnit]
+    }`;
+
+  return (
+    <Panel
+      header={
+        <>
+          <Stack direction="row" spacing={12}>
+            <img src={item.icon} height={32} />
+            <h3>{item.name}</h3>
+            <Stack.Item grow={1} />
+            <h6>
+              {totalProduced > totalConsumed
+                ? "Surplus"
+                : totalProduced === totalConsumed
+                ? "Net"
+                : "Deficit"}
+            </h6>
+            <Tag
+              color={
+                totalProduced > totalConsumed
+                  ? "green"
+                  : totalProduced === totalConsumed
+                  ? "yellow"
+                  : "red"
+              }
+              size="lg"
+            >
+              {formatQuantity(totalProduced - totalConsumed)}
+            </Tag>
+            <Stack.Item basis="20px" />
+            <h6>Total&nbsp;production:</h6>
+            <Tag color="green" size="lg">
+              {formatQuantity(totalProduced)}
+            </Tag>
+            <Stack.Item basis="20px" />
+            <h6>Total&nbsp;consumption:</h6>
+            <Tag color="orange" size="lg">
+              {formatQuantity(totalConsumed)}
+            </Tag>
+          </Stack>
+          <Divider />
+        </>
+      }
+    >
+      {filteredLines.map((line) => (
+        <Panel
+          key={`line-${line.id}`}
+          header={
+            <Stack direction="row" style={{ marginRight: "3%" }}>
+              <h4>{line.name}</h4>
+              <Stack.Item grow={1} />
+              <ViewButton
+                onClick={() => onPageChange(LINE, line.id as number)}
+              />
+            </Stack>
+          }
+          collapsible
+          defaultExpanded
+          bordered
+        >
+          {line.resources.map((resource) => (
             <ResourceRow
               key={`resource-${resource.id}`}
               resource={resource}
@@ -66,7 +122,8 @@ export const ItemDetail = ({
               onDelete={onDelete}
             />
           ))}
-      </Panel>
-    ))}
-  </Panel>
-);
+        </Panel>
+      ))}
+    </Panel>
+  );
+};
