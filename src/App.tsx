@@ -346,7 +346,21 @@ const App = () => {
     }
 
     setError(`Could not find ${currentPage.type} with ID ${currentPage.id}`);
-  }, [dataLoaded, surfaces, currentPage]);
+  }, [
+    dataLoaded,
+    rawItems,
+    itemsByID,
+    surfaces,
+    linesByResource,
+    timeUnit,
+    updateResourceItem,
+    updateResourceConsumed,
+    updateResourceQuantity,
+    navigate,
+    openAddDialog,
+    openRenameDialog,
+    openDeleteDialog,
+  ]);
 
   return dataLoaded ? (
     <Container>
