@@ -46,7 +46,7 @@ export const AddModal = ({
 
   const save = useMemo(
     () => () => onAdd(type, parent, name, clear, mostlyConsumes),
-    [type, parent, name, mostlyConsumes, Clear],
+    [type, parent, name, mostlyConsumes, clear],
   );
 
   return (
