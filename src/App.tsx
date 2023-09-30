@@ -473,11 +473,12 @@ const App = () => {
           <Resources items={itemsSeen} onPageChange={navigate} />
         </Sidebar>
       </Container>
-      <Footer>
+      <Footer style={{ marginTop: "1%" }}>
         <UsageSummary
           productionRates={resourceProductionRates}
           timeUnit={timeUnit}
           itemsByID={itemsByID}
+          onPageChange={navigate}
         />
       </Footer>
     </Container>

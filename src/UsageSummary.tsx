@@ -1,14 +1,16 @@
 import { Loader, Panel, Stack, Tag, TagGroup, Tooltip, Whisper } from "rsuite";
-import { Item } from "./db/DB";
+import { Item, RESOURCE } from "./db/DB";
 
 export const UsageSummary = ({
   productionRates,
   timeUnit,
   itemsByID,
+  onPageChange,
 }: {
   productionRates: { [key: string]: number };
   timeUnit: number;
   itemsByID: { [key: string]: Item };
+  onPageChange: (pageType: string, id: string) => void;
 }) => {
   if (Object.keys(itemsByID).length === 0) {
     return (
@@ -35,8 +37,6 @@ export const UsageSummary = ({
       : -1,
   );
 
-  console.log(productionRates);
-  console.log(orderedRates);
   const formatQuantity = (quantity: number): string =>
     `${quantity.toFixed(3).replace(/0*$/, "").replace(/\.$/, "")}/${
       { 1: "sec", 60: "min", 3600: "hour", 86400: "day" }[timeUnit]
@@ -67,6 +67,7 @@ export const UsageSummary = ({
                     ? "red"
                     : "orange"
                 }
+                onClick={() => onPageChange(RESOURCE, item)}
               >
                 <Stack spacing={6}>
                   <img src={itemsByID[item].icon} height={24} />
