@@ -1,6 +1,14 @@
-import { AdvancedAnalytics } from "@rsuite/icons";
+import { AdvancedAnalytics, PageNext } from "@rsuite/icons";
 import { Divider, List, Panel, Stack } from "rsuite";
-import { Item, LINE, Line, RESOURCE } from "./db/DB";
+import {
+  CATEGORY,
+  Category,
+  Item,
+  LINE,
+  Line,
+  RESOURCE,
+  SURFACE,
+} from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
@@ -8,11 +16,12 @@ import { RenameButton } from "./wrappers/RenameButton";
 
 export const LineDetail = ({
   line,
+  category,
   timeUnit,
   onAdd,
   onRename,
-  onDelete, // onPageChange,
-  categoryConsumes,
+  onDelete,
+  onPageChange,
   items,
   itemsByID,
   updateResource,
@@ -20,6 +29,7 @@ export const LineDetail = ({
   updateResourceConsumed,
 }: {
   line: Line;
+  category: Category;
   timeUnit: number;
   onAdd: (
     type: string,
@@ -28,13 +38,12 @@ export const LineDetail = ({
   ) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
-  categoryConsumes: boolean;
+  onPageChange: (pageType: string, pageID: string | number) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
   updateResource: (resourceID: number, item: string) => void;
   updateResourceQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateResourceConsumed: (resourceID: number, isConsumed: boolean) => void;
-  // onPageChange: (pageType: string, pageID: string | number) => void;
 }) => (
   <Panel
     bordered
@@ -44,12 +53,29 @@ export const LineDetail = ({
           <RenameButton
             onRename={() => onRename(LINE, line.id as number, line.name)}
           />
-          <h3>{line.name}</h3>
+          <h3>
+            <Stack direction="row" spacing={12}>
+              <span onClick={() => onPageChange(SURFACE, category.surface)}>
+                {category.surface}
+              </span>
+              <PageNext />
+              <span
+                onClick={() => onPageChange(CATEGORY, category.id as number)}
+              >
+                {category.name}
+              </span>
+              <PageNext />
+              {line.name}
+            </Stack>
+          </h3>
+
           <Stack.Item grow={1} />
           <AddButton
             icon={AdvancedAnalytics}
             text="Add resource"
-            onClick={() => onAdd(RESOURCE, line.id as number, categoryConsumes)}
+            onClick={() =>
+              onAdd(RESOURCE, line.id as number, category.mostlyConsumes)
+            }
           />
           <DeleteButton
             text="Delete line"
@@ -73,6 +99,7 @@ export const LineDetail = ({
               updateQuantity={updateResourceQuantity}
               updateConsumed={updateResourceConsumed}
               onDelete={onDelete}
+              onPageChange={onPageChange}
             />
           </List.Item>
         ))}

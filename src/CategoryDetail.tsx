@@ -1,6 +1,6 @@
-import { AdvancedAnalytics, TableColumn } from "@rsuite/icons";
+import { AdvancedAnalytics, PageNext, TableColumn } from "@rsuite/icons";
 import { Divider, List, Panel, PanelGroup, Stack, Toggle } from "rsuite";
-import { CATEGORY, LINE, Category, Item, RESOURCE } from "./db/DB";
+import { CATEGORY, LINE, Category, Item, RESOURCE, SURFACE } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
@@ -45,7 +45,15 @@ export const CategoryDetail = ({
                 onRename(CATEGORY, category.id as number, category.name)
               }
             />
-            <h3>{category.name}</h3>
+            <h3>
+              <Stack direction="row" spacing={12}>
+                <span onClick={() => onPageChange(SURFACE, category.surface)}>
+                  {category.surface}
+                </span>
+                <PageNext />
+                {category.name}
+              </Stack>
+            </h3>
             <Stack.Item grow={12} />
             <Stack.Item>
               Mostly&nbsp;{category.mostlyConsumes ? "consumes" : "produces"}
@@ -119,6 +127,7 @@ export const CategoryDetail = ({
                       updateQuantity={updateResourceQuantity}
                       updateConsumed={updateResourceConsumed}
                       onDelete={onDelete}
+                      onPageChange={onPageChange}
                     />
                   </List.Item>
                 ))}

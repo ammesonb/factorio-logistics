@@ -1,11 +1,13 @@
+import { PageNext } from "@rsuite/icons";
 import { Divider, Panel, Stack, Tag } from "rsuite";
-import { Item, LINE, Line } from "./db/DB";
+import { CATEGORY, Category, Item, LINE, Line, SURFACE } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { ViewButton } from "./wrappers/ViewButton";
 
 export const ItemDetail = ({
   item,
   lines,
+  categoriesByID,
   timeUnit,
   onPageChange,
   items,
@@ -17,6 +19,7 @@ export const ItemDetail = ({
 }: {
   item: Item;
   lines: Line[];
+  categoriesByID: { [key: number]: Category };
   timeUnit: number;
   onPageChange: (pageType: string, pageID: string | number) => void;
   items: Item[];
@@ -50,6 +53,8 @@ export const ItemDetail = ({
     `${quantity.toFixed(3).replace(/0*$/, "").replace(/\.$/, "")}/${
       { 1: "sec", 60: "min", 3600: "hour", 86400: "day" }[timeUnit]
     }`;
+
+  console.log(categoriesByID);
 
   return (
     <Panel
@@ -98,7 +103,33 @@ export const ItemDetail = ({
           key={`line-${line.id}`}
           header={
             <Stack direction="row" style={{ marginRight: "3%" }}>
-              <h4>{line.name}</h4>
+              <h4>
+                <Stack direction="row" spacing={12}>
+                  <span
+                    onClick={() =>
+                      onPageChange(
+                        SURFACE,
+                        categoriesByID[line.categoryID].surface,
+                      )
+                    }
+                  >
+                    {categoriesByID[line.categoryID].surface}
+                  </span>
+                  <PageNext />
+                  <span
+                    onClick={() =>
+                      onPageChange(
+                        CATEGORY,
+                        categoriesByID[line.categoryID].id as number,
+                      )
+                    }
+                  >
+                    {categoriesByID[line.categoryID].name}
+                  </span>
+                  <PageNext />
+                  {line.name}
+                </Stack>
+              </h4>
               <Stack.Item grow={1} />
               <ViewButton
                 onClick={() => onPageChange(LINE, line.id as number)}
@@ -120,6 +151,7 @@ export const ItemDetail = ({
               updateQuantity={updateQuantity}
               updateConsumed={updateConsumed}
               onDelete={onDelete}
+              onPageChange={onPageChange}
             />
           ))}
         </Panel>

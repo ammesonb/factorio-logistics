@@ -54,12 +54,12 @@ export const UsageSummary = ({
           orderedRates.map((item) => (
             // TODO: onclick here
             <Whisper
+              key={`item-summary-${item}`}
               placement="top"
               trigger="hover"
               speaker={<Tooltip>{itemsByID[item].name}</Tooltip>}
             >
               <Tag
-                key={`item-summary-${item}`}
                 color={
                   productionRates[item] > 0
                     ? "green"

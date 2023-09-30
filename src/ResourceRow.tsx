@@ -12,6 +12,7 @@ export const ResourceRow = ({
   updateQuantity,
   updateConsumed,
   onDelete,
+  onPageChange,
 }: {
   resource: Resource;
   timeUnit: number;
@@ -21,9 +22,14 @@ export const ResourceRow = ({
   updateQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateConsumed: (resourceID: number, isConsumed: boolean) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
+  onPageChange: (pageType: string, id: string) => void;
 }) => (
   <Stack spacing={16}>
-    <img src={itemsByID[resource.item].icon} height={32} />
+    <img
+      src={itemsByID[resource.item].icon}
+      height={32}
+      onClick={() => onPageChange(RESOURCE, resource.item)}
+    />
     <ResourcePicker
       current={resource.item}
       items={items}

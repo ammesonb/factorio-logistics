@@ -297,11 +297,12 @@ const App = () => {
         return (
           <LineDetail
             line={line}
+            category={categoriesByID[line.categoryID]}
             timeUnit={timeUnit}
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
-            categoryConsumes={categoriesByID[line.categoryID].mostlyConsumes}
+            onPageChange={navigate}
             items={rawItems}
             itemsByID={itemsByID}
             updateResource={(resourceID: number, item: string) =>
@@ -325,6 +326,7 @@ const App = () => {
           // TODO: seen resources is using resources, not the item primitives
           item={itemsByID[currentPage.id as string]}
           lines={linesByResource[currentPage.id as string]}
+          categoriesByID={categoriesByID}
           timeUnit={timeUnit}
           onPageChange={navigate}
           items={rawItems}
@@ -349,6 +351,7 @@ const App = () => {
     rawItems,
     itemsByID,
     surfaces,
+    categoriesByID,
     linesByResource,
     timeUnit,
     updateResourceItem,
