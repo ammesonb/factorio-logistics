@@ -5,6 +5,7 @@ import { ResourcePicker } from "./wrappers/ResourcePicker";
 
 export const ResourceRow = ({
   resource,
+  timeUnit,
   items,
   itemsByID,
   updateResource,
@@ -13,6 +14,7 @@ export const ResourceRow = ({
   onDelete,
 }: {
   resource: Resource;
+  timeUnit: number;
   items: Item[];
   itemsByID: { [key: string]: Item };
   updateResource: (resourceID: number, item: string) => void;
@@ -20,7 +22,7 @@ export const ResourceRow = ({
   updateConsumed: (resourceID: number, isConsumed: boolean) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
 }) => (
-  <Stack spacing={8}>
+  <Stack spacing={16}>
     <img src={itemsByID[resource.item].icon} height={32} />
     <ResourcePicker
       current={resource.item}
@@ -29,17 +31,22 @@ export const ResourceRow = ({
       onChange={(item: string) => updateResource(resource.id as number, item)}
     />
     <Stack.Item grow={1} />
-    <InputNumber
-      value={resource.quantityPerSec}
-      onChange={(value: string | number) =>
-        updateQuantity(
-          resource.id as number,
-          typeof value === typeof "a"
-            ? parseFloat(value as string)
-            : (value as number),
-        )
-      }
-    />
+    <h6>Quantity</h6>
+    <Stack.Item basis="120px">
+      <InputNumber
+        value={resource.quantityPerSec}
+        onChange={(value: string | number) =>
+          updateQuantity(
+            resource.id as number,
+            typeof value === typeof "a"
+              ? parseFloat(value as string)
+              : (value as number),
+          )
+        }
+      />
+    </Stack.Item>
+    <h6>per {{ 1: "sec", 60: "min", 3600: "hour", 86400: "day" }[timeUnit]}</h6>
+    <Stack.Item grow={1} />
     <h6>Is&nbsp;consumed</h6>
     <Toggle
       checked={resource.isConsumed}

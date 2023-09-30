@@ -6,6 +6,7 @@ import { ViewButton } from "./wrappers/ViewButton";
 export const ItemDetail = ({
   item,
   lines,
+  timeUnit,
   onPageChange,
   items,
   itemsByID,
@@ -16,6 +17,7 @@ export const ItemDetail = ({
 }: {
   item: Item;
   lines: Line[];
+  timeUnit: number;
   onPageChange: (pageType: string, pageID: string | number) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
@@ -37,8 +39,9 @@ export const ItemDetail = ({
   >
     {lines.map((line) => (
       <Panel
+        key={`line-${line.id}`}
         header={
-          <Stack direction="row">
+          <Stack direction="row" style={{ marginRight: "3%" }}>
             <h4>{line.name}</h4>
             <Stack.Item grow={1} />
             <ViewButton onClick={() => onPageChange(LINE, line.id as number)} />
@@ -54,6 +57,7 @@ export const ItemDetail = ({
             <ResourceRow
               key={`resource-${resource.id}`}
               resource={resource}
+              timeUnit={timeUnit}
               items={items}
               itemsByID={itemsByID}
               updateResource={updateResource}

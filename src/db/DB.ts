@@ -256,7 +256,7 @@ export const updateResourceConsumed = (
   onError: (e: string) => void,
 ) => {
   db.resources
-    .update(resourceID, { mostlyConsumed: isConsumed })
+    .update(resourceID, { isConsumed })
     .catch((e) => onError(`Failed to update resource consumes: ${e}`));
 };
 

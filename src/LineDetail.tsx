@@ -8,6 +8,7 @@ import { RenameButton } from "./wrappers/RenameButton";
 
 export const LineDetail = ({
   line,
+  timeUnit,
   onAdd,
   onRename,
   onDelete, // onPageChange,
@@ -19,6 +20,7 @@ export const LineDetail = ({
   updateResourceConsumed,
 }: {
   line: Line;
+  timeUnit: number;
   onAdd: (
     type: string,
     parent: string | number,
@@ -64,6 +66,7 @@ export const LineDetail = ({
           <List.Item key={`resource-${resource.id}`}>
             <ResourceRow
               resource={resource}
+              timeUnit={timeUnit}
               items={items}
               itemsByID={itemsByID}
               updateResource={updateResource}

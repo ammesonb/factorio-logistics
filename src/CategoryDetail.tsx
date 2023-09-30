@@ -9,6 +9,7 @@ import { ViewButton } from "./wrappers/ViewButton";
 
 export const CategoryDetail = ({
   category,
+  timeUnit,
   onAdd,
   onRename,
   onDelete,
@@ -21,6 +22,7 @@ export const CategoryDetail = ({
   onPageChange,
 }: {
   category: Category;
+  timeUnit: number;
   onAdd: (type: string, parent: string | number, consumed?: boolean) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
@@ -108,6 +110,7 @@ export const CategoryDetail = ({
                   <List.Item key={`resource-${resource.id}`}>
                     <ResourceRow
                       resource={resource}
+                      timeUnit={timeUnit}
                       items={items}
                       itemsByID={itemsByID}
                       updateResource={updateResource}

@@ -269,6 +269,7 @@ const App = () => {
         return (
           <CategoryDetail
             category={category}
+            timeUnit={timeUnit}
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
@@ -298,6 +299,7 @@ const App = () => {
         return (
           <LineDetail
             line={line}
+            timeUnit={timeUnit}
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
@@ -325,6 +327,7 @@ const App = () => {
           // TODO: seen resources is using resources, not the item primitives
           item={itemsByID[currentPage.id as string]}
           lines={linesByResource[currentPage.id as string]}
+          timeUnit={timeUnit}
           onPageChange={navigate}
           items={rawItems}
           itemsByID={itemsByID}
