@@ -10,6 +10,7 @@ import {
   Button,
   Container,
   Content,
+  Footer,
   Header,
   IconButton,
   InputPicker,
@@ -51,6 +52,7 @@ import { RenameModal } from "./RenameModal";
 import { Resources } from "./Resources";
 import { SurfaceDetail } from "./SurfaceDetail";
 import { Surfaces } from "./Surfaces";
+import { UsageSummary } from "./UsageSummary";
 
 interface History {
   type: string;
@@ -141,11 +143,7 @@ const App = () => {
     return byID;
   }, [surfaces]);
 
-  const {
-    // resourceProductionRates,
-    itemsSeen,
-    linesByResource,
-  } = useMemo(
+  const { resourceProductionRates, itemsSeen, linesByResource } = useMemo(
     () => analyzeResourceUsage(rawResources, itemsByID, linesByID),
     [rawResources, itemsByID, linesByID],
   );
@@ -475,6 +473,13 @@ const App = () => {
           <Resources items={itemsSeen} onPageChange={navigate} />
         </Sidebar>
       </Container>
+      <Footer>
+        <UsageSummary
+          productionRates={resourceProductionRates}
+          timeUnit={timeUnit}
+          itemsByID={itemsByID}
+        />
+      </Footer>
     </Container>
   ) : (
     <DataLoader setLoaded={() => setDataLoaded(true)} />

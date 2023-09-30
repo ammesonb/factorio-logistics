@@ -160,7 +160,7 @@ export const analyzeResourceUsage = (
   rawResources.forEach((resource) => {
     itemsSeen.add(itemsByID[resource.item]);
     resourceProductionRates[resource.item] =
-      resourceProductionRates?.[resource.item] +
+      (resourceProductionRates[resource.item] ?? 0) +
       (resource.isConsumed ? -1 : 1) * resource.quantityPerSec;
     linesByResource[resource.item] = [
       ...(linesByResource?.[resource.item] || []),

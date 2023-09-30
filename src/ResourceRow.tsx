@@ -34,7 +34,7 @@ export const ResourceRow = ({
     <h6>Quantity</h6>
     <Stack.Item basis="120px">
       <InputNumber
-        value={resource.quantityPerSec / timeUnit}
+        value={resource.quantityPerSec * timeUnit}
         onChange={(value: string | number) =>
           updateQuantity(
             resource.id as number,
