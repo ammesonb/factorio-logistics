@@ -35,6 +35,7 @@ import {
   LINE,
   parseDBData,
   renameEntry,
+  RESOURCE,
   Resource,
   SURFACE,
   Surface,
@@ -44,6 +45,7 @@ import {
   updateResourceQuantity,
 } from "./db/DB";
 import { DeleteModal } from "./DeleteModal";
+import { ItemDetail } from "./ItemDetail";
 import { LineDetail } from "./LineDetail";
 import { RenameModal } from "./RenameModal";
 import { Resources } from "./Resources";
@@ -313,6 +315,29 @@ const App = () => {
           />
         );
       }
+    } else if (currentPage.type === RESOURCE) {
+      return (
+        <ItemDetail
+          // TODO: currently using resource instead of item
+          // TODO: seen resources is using resources, not the item primitives
+          item={itemsByID[currentPage.id as string]}
+          // TODO: this
+          lines={[]}
+          onPageChange={navigate}
+          items={rawItems}
+          itemsByID={itemsByID}
+          updateResource={(resourceID: number, item: string) =>
+            updateResourceItem(resourceID, item, setError)
+          }
+          updateQuantity={(resourceID: number, quantityPerSec: number) =>
+            updateResourceQuantity(resourceID, quantityPerSec, setError)
+          }
+          updateConsumed={(resourceID: number, isConsumed: boolean) =>
+            updateResourceConsumed(resourceID, isConsumed, setError)
+          }
+          onDelete={openDeleteDialog}
+        />
+      );
     }
 
     setError(`Could not find ${currentPage.type} with ID ${currentPage.id}`);

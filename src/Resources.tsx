@@ -33,7 +33,7 @@ export const Resources = ({
           >
             {resources.map((resource) => (
               <Nav.Item
-                key={`resource-${resource.item}`}
+                key={`resource-${resource.id}`}
                 eventKey={`surface-${resource.item}`}
                 icon={
                   <img
