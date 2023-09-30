@@ -21,7 +21,7 @@ export interface ICategory {
   id?: number;
   surface: string;
   name: string;
-  mostlyConsumed: boolean;
+  mostlyConsumes: boolean;
 }
 
 export interface ILine {
@@ -73,7 +73,7 @@ export interface Category {
   id?: number;
   surface: string;
   name: string;
-  mostlyConsumed: boolean;
+  mostlyConsumes: boolean;
   lines: Line[];
 }
 
@@ -179,7 +179,7 @@ export const add = (
   name: string,
   onComplete: () => void,
   setError: (text: string) => void,
-  mostlyConsumed?: boolean,
+  mostlyConsumes?: boolean,
 ) => {
   switch (type) {
     case SURFACE:
@@ -192,7 +192,7 @@ export const add = (
         .add({
           name,
           surface: parent as string,
-          mostlyConsumed: mostlyConsumed ?? true,
+          mostlyConsumes: mostlyConsumes ?? true,
         })
         .catch((e) => setError(`Failed to add category: ${e}`));
       break;
@@ -207,7 +207,7 @@ export const add = (
           lineID: parent as number,
           item: name,
           quantityPerSec: 0,
-          isConsumed: mostlyConsumed as boolean,
+          isConsumed: mostlyConsumes as boolean,
         })
         .catch((e) => setError(`Failed to add resource: ${e}`));
       break;
@@ -217,6 +217,16 @@ export const add = (
 };
 
 export const addSurface = (name: string) => db.surfaces.add({ name });
+
+export const updateCategoryConsumes = (
+  categoryID: number,
+  mostlyConsumes: boolean,
+  onError: (e: string) => void,
+) => {
+  db.categories
+    .update(categoryID, { mostlyConsumes })
+    .catch((e) => onError(`Failed to update category consumes: ${e}`));
+};
 
 export const updateResourceItem = (
   resourceID: number,
@@ -245,7 +255,7 @@ export const updateResourceConsumed = (
 ) => {
   db.resources
     .update(resourceID, { mostlyConsumed: isConsumed })
-    .catch((e) => onError(`Failed to update resource quantity: ${e}`));
+    .catch((e) => onError(`Failed to update resource consumes: ${e}`));
 };
 
 export const renameEntry = (

@@ -1,5 +1,5 @@
 import { AdvancedAnalytics, TableColumn } from "@rsuite/icons";
-import { Divider, List, Panel, PanelGroup, Stack } from "rsuite";
+import { Divider, List, Panel, PanelGroup, Stack, Toggle } from "rsuite";
 import { CATEGORY, LINE, Category, Item, RESOURCE } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
@@ -14,6 +14,7 @@ export const CategoryDetail = ({
   onDelete,
   items,
   itemsByID,
+  updateCategoryConsumes,
   updateResource,
   updateResourceQuantity,
   updateResourceConsumed,
@@ -25,6 +26,7 @@ export const CategoryDetail = ({
   onDelete: (type: string, id: string | number, name: string) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
+  updateCategoryConsumes: (categoryID: number, mostlyConsumes: boolean) => void;
   updateResource: (resourceID: number, item: string) => void;
   updateResourceQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateResourceConsumed: (resourceID: number, isConsumed: boolean) => void;
@@ -42,6 +44,14 @@ export const CategoryDetail = ({
               }
             />
             <h3>{category.name}</h3>
+            <Stack.Item grow={12} />
+            <Stack.Item>Mostly&nbsp;consumes</Stack.Item>
+            <Toggle
+              checked={category.mostlyConsumes}
+              onChange={(consumes) =>
+                updateCategoryConsumes(category.id as number, consumes)
+              }
+            />
             <Stack.Item grow={1} />
             <AddButton
               icon={TableColumn}

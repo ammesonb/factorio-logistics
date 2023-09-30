@@ -38,6 +38,7 @@ import {
   Resource,
   SURFACE,
   Surface,
+  updateCategoryConsumes,
   updateResourceConsumed,
   updateResourceItem,
   updateResourceQuantity,
@@ -264,6 +265,10 @@ const App = () => {
             onDelete={openDeleteDialog}
             items={rawItems}
             itemsByID={itemsByID}
+            updateCategoryConsumes={(
+              categoryID: number,
+              mostlyConsumes: boolean,
+            ) => updateCategoryConsumes(categoryID, mostlyConsumes, setError)}
             updateResource={(resourceID: number, item: string) =>
               updateResourceItem(resourceID, item, setError)
             }
