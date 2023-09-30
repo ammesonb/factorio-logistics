@@ -47,7 +47,9 @@ export const CategoryDetail = ({
             />
             <h3>{category.name}</h3>
             <Stack.Item grow={12} />
-            <Stack.Item>Mostly&nbsp;consumes</Stack.Item>
+            <Stack.Item>
+              Mostly&nbsp;{category.mostlyConsumes ? "consumes" : "produces"}
+            </Stack.Item>
             <Toggle
               checked={category.mostlyConsumes}
               onChange={(consumes) =>

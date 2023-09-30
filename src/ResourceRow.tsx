@@ -47,7 +47,7 @@ export const ResourceRow = ({
     </Stack.Item>
     <h6>per {{ 1: "sec", 60: "min", 3600: "hour", 86400: "day" }[timeUnit]}</h6>
     <Stack.Item grow={1} />
-    <h6>Is&nbsp;consumed</h6>
+    <h6>{resource.isConsumed ? "Consuming" : "Producing"}</h6>
     <Toggle
       checked={resource.isConsumed}
       onChange={(isConsumed) =>
