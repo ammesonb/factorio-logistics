@@ -168,9 +168,12 @@ export const analyzeResourceUsage = (
     ];
   });
 
+  const sortedItems = Array.from(itemsSeen);
+  sortedItems.sort((i1, i2) => (i1.name > i2.name ? 1 : -1));
+
   return {
     resourceProductionRates,
-    itemsSeen: Array.from(itemsSeen),
+    itemsSeen: sortedItems,
     linesByResource,
   };
 };
