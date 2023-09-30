@@ -1,23 +1,33 @@
 import { InputNumber, Stack, Toggle } from "rsuite";
 import { Item, RESOURCE, Resource } from "./db/DB";
 import { DeleteButton } from "./wrappers/DeleteButton";
+import { ResourcePicker } from "./wrappers/ResourcePicker";
 
 export const ResourceRow = ({
   resource,
+  items,
   itemsByID,
+  updateResource,
   updateQuantity,
   updateConsumed,
   onDelete,
 }: {
   resource: Resource;
+  items: Item[];
   itemsByID: { [key: string]: Item };
+  updateResource: (resourceID: number, item: string) => void;
   updateQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateConsumed: (resourceID: number, isConsumed: boolean) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
 }) => (
   <Stack spacing={8}>
     <img src={itemsByID[resource.item].icon} height={32} />
-    {itemsByID[resource.item].name}
+    <ResourcePicker
+      current={resource.item}
+      items={items}
+      itemsByID={itemsByID}
+      onChange={(item: string) => updateResource(resource.id as number, item)}
+    />
     <Stack.Item grow={1} />
     <InputNumber
       value={resource.quantityPerSec}

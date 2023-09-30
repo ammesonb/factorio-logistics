@@ -1,17 +1,17 @@
-import { Divider, Nav, Sidenav } from "rsuite";
+import { Divider, Loader, Nav, Sidenav } from "rsuite";
 import { Item, Resource } from "./db/DB";
 import { useState } from "react";
 
 export const Resources = ({
-  items,
+  itemsByID,
   resources,
   onPageChange,
 }: {
-  items: { [key: string]: Item };
+  itemsByID: { [key: string]: Item };
   resources: Resource[];
   onPageChange: (pageType: string, id: string) => void;
 }) => {
-  const [active, setActive] = useState("surface-nauvis");
+  const [active, setActive] = useState("");
 
   return (
     <Sidenav>
@@ -20,26 +20,35 @@ export const Resources = ({
       </Sidenav.Header>
       <Divider />
       <Sidenav.Body>
-        <Nav
-          activeKey={active}
-          onSelect={(eventKey: string) => {
-            setActive(eventKey);
-            const [pageType, pageID] = eventKey.split("-", 2);
-            onPageChange(pageType, pageID);
-          }}
-        >
-          {resources.map((resource) => {
-            return (
+        {Object.keys(itemsByID).length === 0 ? (
+          <Loader center inverse size="lg" />
+        ) : (
+          <Nav
+            activeKey={active}
+            onSelect={(eventKey: string) => {
+              setActive(eventKey);
+              const [pageType, pageID] = eventKey.split("-", 2);
+              onPageChange(pageType, pageID);
+            }}
+          >
+            {resources.map((resource) => (
               <Nav.Item
                 key={`resource-${resource.item}`}
                 eventKey={`surface-${resource.item}`}
-                icon={<img src={items[resource.item].icon} height={32} />}
+                icon={
+                  <img
+                    src={itemsByID[resource.item].icon}
+                    height={32}
+                    style={{ marginRight: "3%" }}
+                  />
+                }
+                style={{ paddingLeft: "8%" }}
               >
-                {items[resource.item].name}
+                {itemsByID[resource.item].name}
               </Nav.Item>
-            );
-          })}
-        </Nav>
+            ))}
+          </Nav>
+        )}
       </Sidenav.Body>
     </Sidenav>
   );

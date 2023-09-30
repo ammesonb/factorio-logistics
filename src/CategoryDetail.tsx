@@ -1,6 +1,6 @@
 import { AdvancedAnalytics, TableColumn } from "@rsuite/icons";
 import { Divider, List, Panel, PanelGroup, Stack } from "rsuite";
-import { CATEGORY, LINE, Category, Item } from "./db/DB";
+import { CATEGORY, LINE, Category, Item, RESOURCE } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
@@ -12,7 +12,9 @@ export const CategoryDetail = ({
   onAdd,
   onRename,
   onDelete,
+  items,
   itemsByID,
+  updateResource,
   updateResourceQuantity,
   updateResourceConsumed,
   onPageChange,
@@ -21,7 +23,9 @@ export const CategoryDetail = ({
   onAdd: (type: string, parent: string | number) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
+  items: Item[];
   itemsByID: { [key: string]: Item };
+  updateResource: (resourceID: number, item: string) => void;
   updateResourceQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateResourceConsumed: (resourceID: number, isConsumed: boolean) => void;
   onPageChange: (pageType: string, pageID: string | number) => void;
@@ -72,7 +76,7 @@ export const CategoryDetail = ({
                   text="Add resource"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAdd(LINE, line.id as number);
+                    onAdd(RESOURCE, line.id as number);
                   }}
                 />
                 <DeleteButton
@@ -94,7 +98,9 @@ export const CategoryDetail = ({
                   <List.Item key={`resource-${resource.id}`}>
                     <ResourceRow
                       resource={resource}
+                      items={items}
                       itemsByID={itemsByID}
+                      updateResource={updateResource}
                       updateQuantity={updateResourceQuantity}
                       updateConsumed={updateResourceConsumed}
                       onDelete={onDelete}

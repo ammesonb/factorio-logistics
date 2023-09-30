@@ -201,6 +201,16 @@ export const add = (
         .add({ name, categoryID: parent as number })
         .catch((e) => setError(`Failed to add line: ${e}`));
       break;
+    case RESOURCE:
+      db.resources
+        .add({
+          lineID: parent as number,
+          item: name,
+          quantityPerSec: 0,
+          isConsumed: mostlyConsumed as boolean,
+        })
+        .catch((e) => setError(`Failed to add resource: ${e}`));
+      break;
   }
 
   onComplete();
@@ -208,20 +218,15 @@ export const add = (
 
 export const addSurface = (name: string) => db.surfaces.add({ name });
 
-export const addCategory = (
-  name: string,
-  surface: string,
-  mostlyConsumed: boolean,
-) => db.categories.add({ name, surface, mostlyConsumed });
-
-export const addLine = (name: string, categoryID: number) =>
-  db.lines.add({ name, categoryID });
-
-export const addResource = (
-  lineID: number,
+export const updateResourceItem = (
+  resourceID: number,
   item: string,
-  isConsumed: boolean,
-) => db.resources.add({ lineID, item, isConsumed, quantityPerSec: 0 });
+  onError: (e: string) => void,
+) => {
+  db.resources
+    .update(resourceID, { item })
+    .catch((e) => onError(`Failed to update resource item: ${e}`));
+};
 
 export const updateResourceQuantity = (
   resourceID: number,

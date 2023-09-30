@@ -39,6 +39,7 @@ import {
   SURFACE,
   Surface,
   updateResourceConsumed,
+  updateResourceItem,
   updateResourceQuantity,
 } from "./db/DB";
 import { DeleteModal } from "./DeleteModal";
@@ -59,7 +60,16 @@ const App = () => {
   const [dataLoaded, setDataLoaded] = useState<boolean>(true);
 
   const [itemsByID, setItems] = useState<{ [key: string]: Item }>({});
-  const rawItems = useLiveQuery(() => db.items.toArray(), [], []);
+  const rawItems: Item[] = useLiveQuery(
+    () =>
+      db.items
+        .toArray()
+        // Sort items by name
+        .then((items) => items.sort((i1, i2) => (i1.name > i2.name ? 1 : -1)))
+        .catch((e) => setError(`Failed to load items: ${e}`)),
+    [],
+    [],
+  ) as Item[];
 
   const [timeUnit, setTimeUnit] = useState(1);
 
@@ -252,7 +262,11 @@ const App = () => {
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
+            items={rawItems}
             itemsByID={itemsByID}
+            updateResource={(resourceID: number, item: string) =>
+              updateResourceItem(resourceID, item, setError)
+            }
             updateResourceQuantity={(
               resourceID: number,
               quantityPerSec: number,
@@ -273,7 +287,11 @@ const App = () => {
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
+            items={rawItems}
             itemsByID={itemsByID}
+            updateResource={(resourceID: number, item: string) =>
+              updateResourceItem(resourceID, item, setError)
+            }
             updateResourceQuantity={(
               resourceID: number,
               quantityPerSec: number,
@@ -348,7 +366,7 @@ const App = () => {
         </Sidebar>
         <Content style={{ padding: "0px 2% 0px 2%" }}>
           {error !== "" && (
-            <Message type="error">
+            <Message type="error" style={{ marginBottom: "3%" }}>
               <Stack direction="row">
                 {error}
                 <Stack.Item grow={1} />
@@ -370,6 +388,8 @@ const App = () => {
               mostlyConsumes?: boolean,
             ) => add(type, parent, name, onComplete, setError, mostlyConsumes)}
             onClose={() => setAddType("")}
+            items={rawItems}
+            itemsByID={itemsByID}
           />
           <RenameModal
             type={renameType}
@@ -398,7 +418,7 @@ const App = () => {
         </Content>
         <Sidebar>
           <Resources
-            items={itemsByID}
+            itemsByID={itemsByID}
             resources={resourcesSeen}
             onPageChange={navigate}
           />

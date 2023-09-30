@@ -1,11 +1,16 @@
 import { useMemo, useState } from "react";
 import { Button, Input, Modal, Stack, Toggle } from "rsuite";
+import { CATEGORY, Item, RESOURCE } from "./db/DB";
+import { ResourcePicker } from "./wrappers/ResourcePicker";
 
 export const AddModal = ({
   type,
   parent,
   onAdd,
   onClose,
+  items,
+  itemsByID,
+  consumes,
 }: {
   type: string;
   parent: string | number;
@@ -17,9 +22,12 @@ export const AddModal = ({
     mostlyConsumes?: boolean,
   ) => void;
   onClose: () => void;
+  items: Item[];
+  itemsByID: { [key: string]: Item };
+  consumes?: boolean;
 }) => {
   const [name, setName] = useState("");
-  const [mostlyConsumes, setMostlyConsumes] = useState(true);
+  const [mostlyConsumes, setMostlyConsumes] = useState(consumes ?? true);
 
   const clear = useMemo(
     () => () => {
@@ -44,17 +52,26 @@ export const AddModal = ({
       </Modal.Header>
       <Modal.Body>
         <h6>Name:</h6>
-        <Input
-          size="lg"
-          autoFocus
-          onChange={setName}
-          onKeyUp={(e) => {
-            if (e.key === "Enter" || e.key === "Return" || e.keyCode === 13) {
-              save();
-            }
-          }}
-        />
-        {type === "category" && (
+        {type !== RESOURCE ? (
+          <Input
+            size="lg"
+            autoFocus
+            onChange={setName}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" || e.key === "Return" || e.keyCode === 13) {
+                save();
+              }
+            }}
+          />
+        ) : (
+          <ResourcePicker
+            current=""
+            items={items}
+            itemsByID={itemsByID}
+            onChange={(resource) => setName(resource)}
+          />
+        )}
+        {type === CATEGORY && (
           <>
             <br />
             <Stack direction="row" spacing={8}>

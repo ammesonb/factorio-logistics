@@ -11,7 +11,9 @@ export const LineDetail = ({
   onAdd,
   onRename,
   onDelete, // onPageChange,
+  items,
   itemsByID,
+  updateResource,
   updateResourceQuantity,
   updateResourceConsumed,
 }: {
@@ -19,7 +21,9 @@ export const LineDetail = ({
   onAdd: (type: string, parent: string | number) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
+  items: Item[];
   itemsByID: { [key: string]: Item };
+  updateResource: (resourceID: number, item: string) => void;
   updateResourceQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateResourceConsumed: (resourceID: number, isConsumed: boolean) => void;
   // onPageChange: (pageType: string, pageID: string | number) => void;
@@ -55,7 +59,9 @@ export const LineDetail = ({
             <List.Item key={`resource-${resource.id}`}>
               <ResourceRow
                 resource={resource}
+                items={items}
                 itemsByID={itemsByID}
+                updateResource={updateResource}
                 updateQuantity={updateResourceQuantity}
                 updateConsumed={updateResourceConsumed}
                 onDelete={onDelete}
