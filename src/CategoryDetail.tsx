@@ -21,7 +21,7 @@ export const CategoryDetail = ({
   onPageChange,
 }: {
   category: Category;
-  onAdd: (type: string, parent: string | number) => void;
+  onAdd: (type: string, parent: string | number, consumed?: boolean) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
   items: Item[];
@@ -86,7 +86,7 @@ export const CategoryDetail = ({
                   text="Add resource"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAdd(RESOURCE, line.id as number);
+                    onAdd(RESOURCE, line.id as number, category.mostlyConsumes);
                   }}
                 />
                 <DeleteButton

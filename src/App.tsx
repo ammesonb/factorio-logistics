@@ -147,13 +147,17 @@ const App = () => {
 
   const [addType, setAddType] = useState("");
   const [addParent, setAddParent] = useState<string | number>("");
+  const [addConsumes, setAddConsumes] = useState<boolean | undefined>(
+    undefined,
+  );
 
   const openAddDialog = useMemo(
-    () => (type: string, parent: string | number) => {
+    () => (type: string, parent: string | number, consumes?: boolean) => {
       setAddType(type);
       setAddParent(parent);
+      setAddConsumes(consumes);
     },
-    [setAddType, setAddParent],
+    [setAddType, setAddParent, setAddConsumes],
   );
 
   const [renameType, setRenameType] = useState("");
@@ -166,7 +170,7 @@ const App = () => {
       setRenameID(id);
       setRenameName(currentName);
     },
-    [setAddType, setAddParent],
+    [setRenameID, setRenameType, setRenameName],
   );
 
   const [deleteType, setDeleteType] = useState("");
@@ -292,6 +296,7 @@ const App = () => {
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
+            categoryConsumes={categoriesByID[line.categoryID].mostlyConsumes}
             items={rawItems}
             itemsByID={itemsByID}
             updateResource={(resourceID: number, item: string) =>
@@ -385,6 +390,7 @@ const App = () => {
           <AddModal
             type={addType}
             parent={addParent}
+            consumes={addConsumes}
             onAdd={(
               type: string,
               parent: string | number,

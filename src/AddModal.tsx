@@ -29,6 +29,12 @@ export const AddModal = ({
   const [name, setName] = useState("");
   const [mostlyConsumes, setMostlyConsumes] = useState(consumes ?? true);
 
+  // Since component is persistent, need to reset consumes on each render if different
+  // useEffect doesn't trigger properly since it is based on state, not render
+  if ((consumes ?? true) !== mostlyConsumes) {
+    setMostlyConsumes(consumes ?? true);
+  }
+
   const clear = useMemo(
     () => () => {
       setName("");
@@ -39,10 +45,8 @@ export const AddModal = ({
   );
 
   const save = useMemo(
-    () => () => {
-      onAdd(type, parent, name, clear, mostlyConsumes);
-    },
-    [type, parent, name, onAdd, clear],
+    () => () => onAdd(type, parent, name, clear, mostlyConsumes),
+    [type, parent, name, mostlyConsumes, Clear],
   );
 
   return (
