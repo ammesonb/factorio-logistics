@@ -19,6 +19,7 @@ import {
 } from "rsuite";
 import { FileType } from "rsuite/esm/Uploader";
 import { db, Item } from "./db/DB";
+import { ImportExportModal } from "./ImportExportModal";
 
 export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
   const [error, setError] = useState("");
@@ -81,6 +82,8 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
     [setError],
   );
 
+  const [importOpen, setImportOpen] = useState(false);
+
   return (
     <Container>
       {error && (
@@ -88,6 +91,11 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
           {error}
         </Message>
       )}
+      <ImportExportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        isExporting={false}
+      />
       <Grid fluid style={{ width: "80%" }}>
         <Row>
           <Col md={18} mdOffset={3}>
@@ -137,6 +145,14 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
                       Upload Icons
                     </Button>
                   </Uploader>
+
+                  <Button
+                    appearance="primary"
+                    color="green"
+                    onClick={() => setImportOpen(true)}
+                  >
+                    Import
+                  </Button>
                 </Stack>
               </>
             </Panel>
@@ -144,7 +160,8 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
         </Row>
 
         <Row style={{ marginTop: "1%" }}>
-          <Col md={3} mdOffset={9} style={{ textAlign: "center" }}>
+          <Stack spacing={24}>
+            <Stack.Item grow={1} />
             <Button
               appearance="primary"
               color="red"
@@ -154,8 +171,6 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
             >
               Clear Items
             </Button>
-          </Col>
-          <Col md={3} style={{ textAlign: "center" }}>
             <Whisper
               placement="right"
               trigger="hover"
@@ -177,7 +192,8 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
                 Done
               </Button>
             </Whisper>
-          </Col>
+            <Stack.Item grow={1} />
+          </Stack>
         </Row>
       </Grid>
       <br />

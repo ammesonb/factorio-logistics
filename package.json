@@ -16,6 +16,7 @@
   "homepage": "https://github.com/ammesonb/factorio-logistics#readme",
   "devDependencies": {
     "@types/node": "^20.7.0",
+    "@types/pako": "^2.0.1",
     "@types/react": "^18.2.23",
     "@types/react-dom": "^18.2.8",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
@@ -39,6 +40,8 @@
     "@rsuite/icons": "^1.0.3",
     "dexie": "^3.2.4",
     "dexie-react-hooks": "^1.1.6",
+    "js-base64": "^3.7.5",
+    "pako": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.0",

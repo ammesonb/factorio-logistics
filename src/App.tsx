@@ -47,6 +47,7 @@ import {
   updateResourceQuantity,
 } from "./db/DB";
 import { DeleteModal } from "./DeleteModal";
+import { ImportExportModal } from "./ImportExportModal";
 import { ItemDetail } from "./ItemDetail";
 import { LineDetail } from "./LineDetail";
 import { RenameModal } from "./RenameModal";
@@ -63,7 +64,7 @@ interface History {
 
 const App = () => {
   const [error, setError] = useState("");
-  const [dataLoaded, setDataLoaded] = useState<boolean>(true);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
   const [itemsByID, setItems] = useState<{ [key: string]: Item }>({});
   const rawItems: Item[] = useLiveQuery(
@@ -376,6 +377,8 @@ const App = () => {
     openDeleteDialog,
   ]);
 
+  const [impExpMode, setImpExpMode] = useState("");
+
   return dataLoaded ? (
     <Container>
       <Header style={{ marginBottom: "1%" }}>
@@ -415,10 +418,18 @@ const App = () => {
           >
             Update Item List
           </Button>
-          <Button appearance="primary" color="green">
+          <Button
+            appearance="primary"
+            color="green"
+            onClick={() => setImpExpMode("Import")}
+          >
             Import
           </Button>
-          <Button appearance="primary" color="violet">
+          <Button
+            appearance="primary"
+            color="violet"
+            onClick={() => setImpExpMode("Export")}
+          >
             Export
           </Button>
         </Stack>
@@ -482,6 +493,11 @@ const App = () => {
               onComplete: () => void,
             ) => deleteEntry(type, id, onComplete, setError)}
             onClose={() => setDeleteType("")}
+          />
+          <ImportExportModal
+            open={impExpMode.length > 0}
+            onClose={() => setImpExpMode("")}
+            isExporting={impExpMode === "Export"}
           />
           {pageBody}
         </Content>

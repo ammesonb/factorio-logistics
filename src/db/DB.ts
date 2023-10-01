@@ -1,4 +1,6 @@
 import Dexie, { Table } from "dexie";
+import { Base64 } from "js-base64";
+import Pako from "pako";
 
 const DB_NAME = "FactorioLogistics";
 
@@ -451,3 +453,55 @@ export const deleteLine = async (
 
 export const deleteResource = async (id: number, onError: (e: Error) => void) =>
   db.resources.delete(id).catch(onError);
+
+export const exportData = async (): Promise<string> =>
+  Base64.fromUint8Array(
+    Pako.deflate(
+      JSON.stringify({
+        items: await db.items.toArray(),
+        surfaces: await db.surfaces.toArray(),
+        categories: await db.categories.toArray(),
+        lines: await db.lines.toArray(),
+        resources: await db.resources.toArray(),
+      }),
+    ),
+  );
+
+export const importData = async (compressed: string) => {
+  const data = JSON.parse(
+    Pako.inflate(Base64.toUint8Array(compressed), { to: "string" }),
+  );
+
+  const keys = Object.keys(data);
+
+  db.transaction(
+    "rw",
+    db.items,
+    db.surfaces,
+    db.categories,
+    db.lines,
+    db.resources,
+    async () => {
+      if (keys.includes("items")) {
+        await db.items.clear();
+        db.items.bulkAdd(data.items);
+      }
+      if (keys.includes("resources")) {
+        await db.resources.clear();
+        db.resources.bulkAdd(data.resources);
+      }
+      if (keys.includes("lines")) {
+        await db.lines.clear();
+        db.lines.bulkAdd(data.lines);
+      }
+      if (keys.includes("categories")) {
+        await db.categories.clear();
+        db.categories.bulkAdd(data.categories);
+      }
+      if (keys.includes("surfaces")) {
+        await db.surfaces.clear();
+        db.surfaces.bulkAdd(data.surfaces);
+      }
+    },
+  );
+};
