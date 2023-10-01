@@ -62,9 +62,11 @@ export const CategoryDetail = ({
               Mostly&nbsp;{category.mostlyConsumes ? "consumes" : "produces"}
             </Stack.Item>
             <Toggle
-              checked={category.mostlyConsumes}
+              // negate these because it makes more sense to have the toggle be
+              // positive, aka produces
+              checked={!category.mostlyConsumes}
               onChange={(consumes) =>
-                updateCategoryConsumes(category.id as number, consumes)
+                updateCategoryConsumes(category.id as number, !consumes)
               }
             />
             <Stack.Item grow={1} />

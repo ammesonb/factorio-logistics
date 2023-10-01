@@ -57,8 +57,6 @@ export const ItemDetail = ({
       { 1: "sec", 60: "min", 3600: "hour", 86400: "day" }[timeUnit]
     }`;
 
-  console.log(categoriesByID);
-
   return (
     <Panel
       header={

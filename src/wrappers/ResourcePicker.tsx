@@ -15,6 +15,9 @@ export const ResourcePicker = ({
   enabled?: boolean;
 }) => (
   <InputPicker
+    // Have to use fixed width here to prevent the ResizeObserver loop error with chrome-based browsers
+    style={{ width: "250px" }}
+    cleanable={false}
     data={items.map((item) => ({ label: item.name, value: item.internalName }))}
     defaultValue={current}
     placeholder="Select item"

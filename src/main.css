@@ -8,3 +8,10 @@ html, body {
 body {
   padding: 1%;
 }
+
+/* Hack to hide resizeobserver loop undelievered notifications error */
+:root {
+     iframe#webpack-dev-server-client-overlay {
+          display: none !important
+     }
+}

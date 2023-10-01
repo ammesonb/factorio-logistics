@@ -18,7 +18,7 @@ export const Resources = ({
       </Sidenav.Header>
       <Divider />
       <Sidenav.Body>
-        {items.length === 0 || !items[0] ? (
+        {items.length > 0 && !items[0] ? (
           <Loader center inverse size="lg" />
         ) : (
           <Nav

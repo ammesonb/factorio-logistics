@@ -94,7 +94,7 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
             <Panel bordered>
               <>
                 <ReactMarkdown>{`## Instructions
-1. You will need to generate some sources from Factorio for this tool to work.
+1. You will need to generate some sources from Factorio for this tool to work
     - Reference their [command line parameters](https://wiki.factorio.com/Command_line_parameters) page as needed
 2. Upload the outputted item JSON using the button below
 3. Upload icons from the Factorio output (supports multi-select)

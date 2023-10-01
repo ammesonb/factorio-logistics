@@ -60,9 +60,11 @@ export const ResourceRow = ({
     <Stack.Item grow={1} />
     <h6>{resource.isConsumed ? "Consuming" : "Producing"}</h6>
     <Toggle
-      checked={resource.isConsumed}
+      // negate these because it makes more sense to have the toggle be
+      // positive, aka produces
+      checked={!resource.isConsumed}
       onChange={(isConsumed) =>
-        updateConsumed(resource.id as number, isConsumed)
+        updateConsumed(resource.id as number, !isConsumed)
       }
       disabled={!enabled}
     />
