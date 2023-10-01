@@ -214,7 +214,10 @@ export const Surfaces = ({
 }) => {
   const [active, setActive] = useState("surface-Nauvis");
   return (
-    <Sidenav defaultOpenKeys={["Nauvis"]}>
+    <Sidenav
+      defaultOpenKeys={["Nauvis"]}
+      style={{ maxHeight: "80vh", overflowY: "scroll" }}
+    >
       <Sidenav.Header style={{ padding: "5% 5% 0% 5%" }}>
         <Stack
           direction="row"

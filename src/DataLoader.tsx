@@ -51,13 +51,18 @@ export const DataLoader = ({ setLoaded }: { setLoaded: () => void }) => {
           } else {
             // Some names have colors in them, it seems - fluids in particular
             db.items.bulkPut(
-              Object.entries(newItems["names"]).map(
-                ([internalName, display]) => ({
+              Object.entries(newItems["names"])
+                .filter(([name]) => !name.startsWith("YARM-fake-"))
+                // Filter out primitives that are undesired
+                .filter(
+                  ([name]) =>
+                    !["tree", "rock", "ruin"].includes(name.toLowerCase()),
+                )
+                .map(([internalName, display]) => ({
                   internalName,
                   name: (display as string).split("[color")[0],
                   icon: "",
-                }),
-              ),
+                })),
             );
           }
         });

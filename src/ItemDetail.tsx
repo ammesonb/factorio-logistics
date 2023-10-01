@@ -71,6 +71,7 @@ export const ItemDetail = ({
                 : totalProduced === totalConsumed
                 ? "Net"
                 : "Deficit"}
+              :
             </h6>
             <Tag
               color={
@@ -82,17 +83,17 @@ export const ItemDetail = ({
               }
               size="lg"
             >
-              {formatQuantity(totalProduced - totalConsumed)}
+              {formatQuantity((totalProduced - totalConsumed) * timeUnit)}
             </Tag>
             <Stack.Item basis="20px" />
             <h6>Total&nbsp;production:</h6>
             <Tag color="green" size="lg">
-              {formatQuantity(totalProduced)}
+              {formatQuantity(totalProduced * timeUnit)}
             </Tag>
             <Stack.Item basis="20px" />
             <h6>Total&nbsp;consumption:</h6>
             <Tag color="orange" size="lg">
-              {formatQuantity(totalConsumed)}
+              {formatQuantity(totalConsumed * timeUnit)}
             </Tag>
           </Stack>
           <Divider />
