@@ -12,6 +12,7 @@ import {
 import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
+import { ProductionToggle } from "./wrappers/ProductionToggle";
 import { RenameButton } from "./wrappers/RenameButton";
 
 export const LineDetail = ({
@@ -24,6 +25,7 @@ export const LineDetail = ({
   onPageChange,
   items,
   itemsByID,
+  toggleProduction,
   updateResource,
   updateResourceQuantity,
   updateResourceConsumed,
@@ -41,6 +43,7 @@ export const LineDetail = ({
   onPageChange: (pageType: string, pageID: string | number) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
+  toggleProduction: (type: string, id: number, enabled: boolean) => void;
   updateResource: (resourceID: number, item: string) => void;
   updateResourceQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateResourceConsumed: (resourceID: number, isConsumed: boolean) => void;
@@ -70,6 +73,12 @@ export const LineDetail = ({
           </h3>
 
           <Stack.Item grow={1} />
+          <ProductionToggle
+            type={LINE}
+            id={line.id as number}
+            enabled={line.enabled}
+            toggleProduction={toggleProduction}
+          />
           <AddButton
             icon={AdvancedAnalytics}
             text="Add resource"
@@ -100,6 +109,7 @@ export const LineDetail = ({
               updateConsumed={updateResourceConsumed}
               onDelete={onDelete}
               onPageChange={onPageChange}
+              enabled={line.enabled ?? true}
             />
           </List.Item>
         ))}

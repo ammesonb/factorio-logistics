@@ -3,6 +3,7 @@ import { Divider, List, Panel, PanelGroup, Stack } from "rsuite";
 import { CATEGORY, LINE, SURFACE, Surface } from "./db/DB";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
+import { ProductionToggle } from "./wrappers/ProductionToggle";
 import { RenameButton } from "./wrappers/RenameButton";
 import { ViewButton } from "./wrappers/ViewButton";
 
@@ -11,12 +12,14 @@ export const SurfaceDetail = ({
   onAdd,
   onRename,
   onDelete,
+  toggleProduction,
   onPageChange,
 }: {
   surface: Surface;
   onAdd: (type: string, parent: string | number) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
+  toggleProduction: (type: string, id: number, enabled: boolean) => void;
   onPageChange: (pageType: string, pageID: string | number) => void;
 }) => {
   return (
@@ -58,6 +61,12 @@ export const SurfaceDetail = ({
                 />
                 <h4>{category.name}</h4>
                 <Stack.Item grow={1} />
+                <ProductionToggle
+                  type={CATEGORY}
+                  id={category.id as number}
+                  enabled={category.enabled}
+                  toggleProduction={toggleProduction}
+                />
                 <AddButton
                   icon={TableColumn}
                   text="Add line"
@@ -94,6 +103,18 @@ export const SurfaceDetail = ({
                       />
                       {line.name}
                       <Stack.Item grow={1} />
+                      <span
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          e.stopPropagation()
+                        }
+                      >
+                        <ProductionToggle
+                          type={LINE}
+                          id={line.id as number}
+                          enabled={line.enabled}
+                          toggleProduction={toggleProduction}
+                        />
+                      </span>
                       <DeleteButton
                         onClick={(e) => {
                           e.stopPropagation();

@@ -5,6 +5,7 @@ import { ResourcePicker } from "./wrappers/ResourcePicker";
 
 export const ResourceRow = ({
   resource,
+  enabled,
   timeUnit,
   items,
   itemsByID,
@@ -15,6 +16,7 @@ export const ResourceRow = ({
   onPageChange,
 }: {
   resource: Resource;
+  enabled: boolean;
   timeUnit: number;
   items: Item[];
   itemsByID: { [key: string]: Item };
@@ -29,12 +31,14 @@ export const ResourceRow = ({
       src={itemsByID[resource.item].icon}
       height={32}
       onClick={() => onPageChange(RESOURCE, resource.item)}
+      style={{ filter: enabled ? "" : "grayscale(1)" }}
     />
     <ResourcePicker
       current={resource.item}
       items={items}
       itemsByID={itemsByID}
       onChange={(item: string) => updateResource(resource.id as number, item)}
+      enabled={enabled}
     />
     <Stack.Item grow={1} />
     <h6>Quantity</h6>
@@ -49,6 +53,7 @@ export const ResourceRow = ({
               : (value as number)) / timeUnit,
           )
         }
+        disabled={!enabled}
       />
     </Stack.Item>
     <h6>per {{ 1: "sec", 60: "min", 3600: "hour", 86400: "day" }[timeUnit]}</h6>
@@ -59,6 +64,7 @@ export const ResourceRow = ({
       onChange={(isConsumed) =>
         updateConsumed(resource.id as number, isConsumed)
       }
+      disabled={!enabled}
     />
     <Stack.Item grow={4} />
     <DeleteButton

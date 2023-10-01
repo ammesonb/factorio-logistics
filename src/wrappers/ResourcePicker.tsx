@@ -6,11 +6,13 @@ export const ResourcePicker = ({
   items,
   itemsByID,
   onChange,
+  enabled,
 }: {
   current: string;
   items: Item[];
   itemsByID: { [key: string]: Item };
   onChange: (value: string) => void;
+  enabled?: boolean;
 }) => (
   <InputPicker
     data={items.map((item) => ({ label: item.name, value: item.internalName }))}
@@ -28,5 +30,6 @@ export const ResourcePicker = ({
     )}
     onChange={onChange}
     virtualized
+    disabled={enabled === false}
   />
 );

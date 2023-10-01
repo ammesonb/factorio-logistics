@@ -40,6 +40,7 @@ import {
   Resource,
   SURFACE,
   Surface,
+  toggleProduction,
   updateCategoryConsumes,
   updateResourceConsumed,
   updateResourceItem,
@@ -257,6 +258,9 @@ const App = () => {
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
+            toggleProduction={(type: string, id: number, enabled: boolean) =>
+              toggleProduction(type, id, enabled, setError)
+            }
             onPageChange={navigate}
           />
         );
@@ -273,6 +277,9 @@ const App = () => {
             onDelete={openDeleteDialog}
             items={rawItems}
             itemsByID={itemsByID}
+            toggleProduction={(type: string, id: number, enabled: boolean) =>
+              toggleProduction(type, id, enabled, setError)
+            }
             updateCategoryConsumes={(
               categoryID: number,
               mostlyConsumes: boolean,
@@ -305,6 +312,9 @@ const App = () => {
             onPageChange={navigate}
             items={rawItems}
             itemsByID={itemsByID}
+            toggleProduction={(type: string, id: number, enabled: boolean) =>
+              toggleProduction(type, id, enabled, setError)
+            }
             updateResource={(resourceID: number, item: string) =>
               updateResourceItem(resourceID, item, setError)
             }
@@ -331,6 +341,9 @@ const App = () => {
           onPageChange={navigate}
           items={rawItems}
           itemsByID={itemsByID}
+          toggleProduction={(type: string, id: number, enabled: boolean) =>
+            toggleProduction(type, id, enabled, setError)
+          }
           updateResource={(resourceID: number, item: string) =>
             updateResourceItem(resourceID, item, setError)
           }

@@ -22,12 +22,14 @@ export interface ICategory {
   surface: string;
   name: string;
   mostlyConsumes: boolean;
+  enabled: boolean;
 }
 
 export interface ILine {
   id?: number;
   categoryID: number;
   name: string;
+  enabled: boolean;
 }
 
 export interface Resource {
@@ -75,6 +77,7 @@ export interface Category {
   name: string;
   mostlyConsumes: boolean;
   lines: Line[];
+  enabled: boolean;
 }
 
 export interface Line {
@@ -82,6 +85,7 @@ export interface Line {
   categoryID: number;
   name: string;
   resources: Resource[];
+  enabled: boolean;
 }
 
 export const parseDBData = (
@@ -159,9 +163,14 @@ export const analyzeResourceUsage = (
   const linesByResource: { [key: string]: Line[] } = {};
   rawResources.forEach((resource) => {
     itemsSeen.add(itemsByID[resource.item]);
+
     resourceProductionRates[resource.item] =
       (resourceProductionRates[resource.item] ?? 0) +
-      (resource.isConsumed ? -1 : 1) * resource.quantityPerSec;
+      // Only add resource for production if the line is enabled
+      (linesByID[resource.lineID].enabled
+        ? (resource.isConsumed ? -1 : 1) * resource.quantityPerSec
+        : 0);
+
     linesByResource[resource.item] = [
       ...(linesByResource?.[resource.item] || []),
       linesByID[resource.lineID],
@@ -198,12 +207,13 @@ export const add = (
           name,
           surface: parent as string,
           mostlyConsumes: mostlyConsumes ?? true,
+          enabled: true,
         })
         .catch((e) => setError(`Failed to add category: ${e}`));
       break;
     case LINE:
       db.lines
-        .add({ name, categoryID: parent as number })
+        .add({ name, categoryID: parent as number, enabled: true })
         .catch((e) => setError(`Failed to add line: ${e}`));
       break;
     case RESOURCE:
@@ -222,6 +232,43 @@ export const add = (
 };
 
 export const addSurface = (name: string) => db.surfaces.add({ name });
+
+export const toggleProduction = (
+  type: string,
+  id: number,
+  enabled: boolean,
+  onError: (e: string) => void,
+) => {
+  if (type === CATEGORY) {
+    toggleCategory(id, enabled, onError);
+  } else {
+    toggleLine(id, enabled, onError);
+  }
+};
+
+const toggleCategory = (
+  categoryID: number,
+  enabled: boolean,
+  onError: (e: string) => void,
+) => {
+  db.categories
+    .update(categoryID, { enabled })
+    .catch((e) => onError(`Failed to toggle category: ${e}`));
+  db.lines
+    .where({ categoryID })
+    .modify({ enabled })
+    .catch((e) => onError(`Failed to toggle lines: ${e}`));
+};
+
+const toggleLine = (
+  lineID: number,
+  enabled: boolean,
+  onError: (e: string) => void,
+) => {
+  db.lines
+    .update(lineID, { enabled })
+    .catch((e) => onError(`Failed to toggle line: ${e}`));
+};
 
 export const updateCategoryConsumes = (
   categoryID: number,

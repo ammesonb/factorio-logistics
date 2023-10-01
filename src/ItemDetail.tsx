@@ -2,6 +2,7 @@ import { PageNext } from "@rsuite/icons";
 import { Divider, Panel, Stack, Tag } from "rsuite";
 import { CATEGORY, Category, Item, LINE, Line, SURFACE } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
+import { ProductionToggle } from "./wrappers/ProductionToggle";
 import { ViewButton } from "./wrappers/ViewButton";
 
 export const ItemDetail = ({
@@ -12,6 +13,7 @@ export const ItemDetail = ({
   onPageChange,
   items,
   itemsByID,
+  toggleProduction,
   updateResource,
   updateQuantity,
   updateConsumed,
@@ -24,6 +26,7 @@ export const ItemDetail = ({
   onPageChange: (pageType: string, pageID: string | number) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
+  toggleProduction: (type: string, id: number, enabled: boolean) => void;
   updateResource: (resourceID: number, item: string) => void;
   updateQuantity: (resourceID: number, quantityPerSec: number) => void;
   updateConsumed: (resourceID: number, isConsumed: boolean) => void;
@@ -37,9 +40,9 @@ export const ItemDetail = ({
     resources: l.resources.filter((r) => {
       if (r.item === item.internalName) {
         if (r.isConsumed) {
-          totalConsumed += r.quantityPerSec;
+          totalConsumed += l.enabled ? r.quantityPerSec : 0;
         } else {
-          totalProduced += r.quantityPerSec;
+          totalProduced += l.enabled ? r.quantityPerSec : 0;
         }
 
         return true;
@@ -102,7 +105,7 @@ export const ItemDetail = ({
         <Panel
           key={`line-${line.id}`}
           header={
-            <Stack direction="row" style={{ marginRight: "3%" }}>
+            <Stack direction="row" style={{ marginRight: "3%" }} spacing={12}>
               <h4>
                 <Stack direction="row" spacing={12}>
                   <span
@@ -131,6 +134,12 @@ export const ItemDetail = ({
                 </Stack>
               </h4>
               <Stack.Item grow={1} />
+              <ProductionToggle
+                type={LINE}
+                id={line.id as number}
+                enabled={line.enabled}
+                toggleProduction={toggleProduction}
+              />
               <ViewButton
                 onClick={() => onPageChange(LINE, line.id as number)}
               />
@@ -152,6 +161,7 @@ export const ItemDetail = ({
               updateConsumed={updateConsumed}
               onDelete={onDelete}
               onPageChange={onPageChange}
+              enabled={line.enabled ?? true}
             />
           ))}
         </Panel>

@@ -4,6 +4,7 @@ import { CATEGORY, LINE, Category, Item, RESOURCE, SURFACE } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
+import { ProductionToggle } from "./wrappers/ProductionToggle";
 import { RenameButton } from "./wrappers/RenameButton";
 import { ViewButton } from "./wrappers/ViewButton";
 
@@ -15,6 +16,7 @@ export const CategoryDetail = ({
   onDelete,
   items,
   itemsByID,
+  toggleProduction,
   updateCategoryConsumes,
   updateResource,
   updateResourceQuantity,
@@ -28,6 +30,7 @@ export const CategoryDetail = ({
   onDelete: (type: string, id: string | number, name: string) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
+  toggleProduction: (type: string, id: number, enabled: boolean) => void;
   updateCategoryConsumes: (categoryID: number, mostlyConsumes: boolean) => void;
   updateResource: (resourceID: number, item: string) => void;
   updateResourceQuantity: (resourceID: number, quantityPerSec: number) => void;
@@ -65,6 +68,12 @@ export const CategoryDetail = ({
               }
             />
             <Stack.Item grow={1} />
+            <ProductionToggle
+              type={CATEGORY}
+              id={category.id as number}
+              enabled={category.enabled}
+              toggleProduction={toggleProduction}
+            />
             <AddButton
               icon={TableColumn}
               text="Add line"
@@ -93,6 +102,12 @@ export const CategoryDetail = ({
                 />
                 <h4>{line.name}</h4>
                 <Stack.Item grow={1} />
+                <ProductionToggle
+                  type={LINE}
+                  id={line.id as number}
+                  enabled={line.enabled}
+                  toggleProduction={toggleProduction}
+                />
                 <AddButton
                   icon={AdvancedAnalytics}
                   text="Add resource"
@@ -128,6 +143,7 @@ export const CategoryDetail = ({
                       updateConsumed={updateResourceConsumed}
                       onDelete={onDelete}
                       onPageChange={onPageChange}
+                      enabled={line.enabled ?? true}
                     />
                   </List.Item>
                 ))}
