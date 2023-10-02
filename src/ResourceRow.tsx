@@ -1,3 +1,4 @@
+import { FocusEvent } from "react";
 import { InputNumber, Stack, Toggle } from "rsuite";
 import { Item, RESOURCE, Resource } from "./db/DB";
 import { DeleteButton } from "./wrappers/DeleteButton";
@@ -44,13 +45,11 @@ export const ResourceRow = ({
     <h6>Quantity</h6>
     <Stack.Item basis="120px">
       <InputNumber
-        value={resource.quantityPerSec * timeUnit}
-        onChange={(value: string | number) =>
+        defaultValue={resource.quantityPerSec * timeUnit}
+        onBlur={(e: FocusEvent<HTMLInputElement>) =>
           updateQuantity(
             resource.id as number,
-            (typeof value === typeof "a"
-              ? parseFloat(value as string)
-              : (value as number)) / timeUnit,
+            parseFloat(e.currentTarget.value),
           )
         }
         disabled={!enabled}

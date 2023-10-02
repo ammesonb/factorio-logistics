@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button, Input, Modal, Stack, Toggle } from "rsuite";
 import { CATEGORY, Item, RESOURCE } from "./db/DB";
 import { ResourcePicker } from "./wrappers/ResourcePicker";
@@ -27,6 +27,7 @@ export const AddModal = ({
   consumes?: boolean;
 }) => {
   const [name, setName] = useState("");
+  const addRef = useRef<HTMLButtonElement>(null);
   const [mostlyConsumes, setMostlyConsumes] = useState(consumes ?? true);
 
   // Since component is persistent, need to reset consumes on each render if different
@@ -49,6 +50,9 @@ export const AddModal = ({
     [type, parent, name, mostlyConsumes, clear],
   );
 
+  const keyIsEnter = (key: string, keyCode: number): boolean =>
+    key === "Enter" || key === "Return" || keyCode === 13;
+
   return (
     <Modal autoFocus enforceFocus size="md" open={type !== ""} onClose={clear}>
       <Modal.Header>
@@ -60,9 +64,11 @@ export const AddModal = ({
           <Input
             size="lg"
             autoFocus
-            onChange={setName}
+            onChange={(value) => {
+              setName(value);
+            }}
             onKeyUp={(e) => {
-              if (e.key === "Enter" || e.key === "Return" || e.keyCode === 13) {
+              if (keyIsEnter(e.key, e.keyCode)) {
                 save();
               }
             }}
@@ -72,7 +78,12 @@ export const AddModal = ({
             current=""
             items={items}
             itemsByID={itemsByID}
-            onChange={(resource) => setName(resource)}
+            onChange={(resource) => {
+              setName(resource);
+              if (addRef.current) {
+                addRef.current.focus();
+              }
+            }}
             autoFocus={true}
           />
         )}
@@ -90,7 +101,7 @@ export const AddModal = ({
         <Button appearance="primary" color="red" onClick={clear}>
           Cancel
         </Button>
-        <Button appearance="primary" color="green" onClick={save}>
+        <Button appearance="primary" color="green" onClick={save} ref={addRef}>
           Add
         </Button>
       </Modal.Footer>
