@@ -52,6 +52,18 @@ export const ItemDetail = ({
     }),
   }));
 
+  filteredLines.sort((l1, l2) => {
+    const l1Qty = l1.resources.reduce((s, r) => s + r.quantityPerSec, 0);
+    const l2Qty = l2.resources.reduce((s, r) => s + r.quantityPerSec, 0);
+    return l1Qty === l2Qty
+      ? l1.name > l2.name
+        ? 1
+        : -1
+      : l1Qty < l2Qty
+      ? 1
+      : -1;
+  });
+
   const formatQuantity = (quantity: number): string =>
     `${quantity.toFixed(3).replace(/0*$/, "").replace(/\.$/, "")}/${
       { 1: "sec", 60: "min", 3600: "hour", 86400: "day" }[timeUnit]
