@@ -9,6 +9,7 @@ export const ResourcePicker = ({
   onChange,
   enabled,
   autoFocus,
+  tabIndex,
 }: {
   current: string;
   items: Item[];
@@ -16,6 +17,7 @@ export const ResourcePicker = ({
   onChange: (value: string) => void;
   enabled?: boolean;
   autoFocus?: boolean;
+  tabIndex?: number;
 }) => {
   const ref = useRef<PickerHandle>(null);
 
@@ -51,6 +53,7 @@ export const ResourcePicker = ({
       disabled={enabled === false}
       autoFocus={autoFocus ?? false}
       ref={ref}
+      tabIndex={tabIndex ? tabIndex : 1}
     />
   );
 };

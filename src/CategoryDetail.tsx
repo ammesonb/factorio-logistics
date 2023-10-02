@@ -133,7 +133,7 @@ export const CategoryDetail = ({
           >
             {line.resources.length > 0 && (
               <List bordered>
-                {line.resources.map((resource) => (
+                {line.resources.map((resource, index) => (
                   <List.Item key={`resource-${resource.id}`}>
                     <ResourceRow
                       resource={resource}
@@ -146,6 +146,8 @@ export const CategoryDetail = ({
                       onDelete={onDelete}
                       onPageChange={onPageChange}
                       enabled={line.enabled ?? true}
+                      itemTabIndex={index + 1}
+                      quantityTabIndex={line.resources.length + index + 1}
                     />
                   </List.Item>
                 ))}
