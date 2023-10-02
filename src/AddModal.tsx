@@ -73,6 +73,7 @@ export const AddModal = ({
             items={items}
             itemsByID={itemsByID}
             onChange={(resource) => setName(resource)}
+            autoFocus={true}
           />
         )}
         {type === CATEGORY && (
