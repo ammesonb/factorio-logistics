@@ -47,11 +47,12 @@ export const SurfaceDetail = ({
         </>
       }
     >
-      <PanelGroup accordion defaultActiveKey={surface.categories[0]?.id}>
+      <PanelGroup>
         {surface.categories.map((category) => (
           <Panel
             key={`category-${category.id}`}
             eventKey={category.id}
+            collapsible
             header={
               <Stack direction="row" style={{ marginRight: "3%" }} spacing={12}>
                 <RenameButton

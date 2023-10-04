@@ -173,10 +173,19 @@ export const analyzeResourceUsage = (
         ? (resource.isConsumed ? -1 : 1) * resource.quantityPerSec
         : 0);
 
-    linesByResource[resource.item] = [
-      ...(linesByResource?.[resource.item] || []),
-      linesByID[resource.lineID],
-    ];
+    // Since same product can be in line multiple times, only include it
+    // if not already present
+    if (
+      !linesByResource[resource.item] ||
+      !linesByResource[resource.item]
+        .map((l) => l.id)
+        .includes(linesByID[resource.lineID].id)
+    ) {
+      linesByResource[resource.item] = [
+        ...(linesByResource?.[resource.item] || []),
+        linesByID[resource.lineID],
+      ];
+    }
   });
 
   const sortedItems = Array.from(itemsSeen);
@@ -234,6 +243,24 @@ export const add = (
 };
 
 export const addSurface = (name: string) => db.surfaces.add({ name });
+
+export const duplicateLine = (line: Line, onError: (e: string) => void) => {
+  delete line.id;
+
+  db.lines
+    .add(line)
+    .then((lineID) => {
+      const rs = line.resources.map((r) => {
+        const resource = { ...r, lineID: lineID as number };
+        delete resource.id;
+        return resource;
+      });
+      db.resources
+        .bulkAdd(rs)
+        .catch((e) => onError(`Failed to copy resources: ${e}`));
+    })
+    .catch((e) => onError(`Failed to copy line: ${e}`));
+};
 
 export const toggleProduction = (
   type: string,

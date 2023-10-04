@@ -1,6 +1,22 @@
-import { AdvancedAnalytics, PageNext, TableColumn } from "@rsuite/icons";
-import { Divider, List, Panel, PanelGroup, Stack, Toggle } from "rsuite";
-import { CATEGORY, LINE, Category, Item, RESOURCE, SURFACE } from "./db/DB";
+import { AdvancedAnalytics, Copy, PageNext, TableColumn } from "@rsuite/icons";
+import {
+  Divider,
+  IconButton,
+  List,
+  Panel,
+  PanelGroup,
+  Stack,
+  Toggle,
+} from "rsuite";
+import {
+  CATEGORY,
+  LINE,
+  Category,
+  Item,
+  RESOURCE,
+  SURFACE,
+  Line,
+} from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
@@ -14,6 +30,7 @@ export const CategoryDetail = ({
   onAdd,
   onRename,
   onDelete,
+  onDuplicate,
   items,
   itemsByID,
   toggleProduction,
@@ -28,6 +45,7 @@ export const CategoryDetail = ({
   onAdd: (type: string, parent: string | number, consumed?: boolean) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
+  onDuplicate: (line: Line) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
   toggleProduction: (type: string, id: number, enabled: boolean) => void;
@@ -92,11 +110,12 @@ export const CategoryDetail = ({
         </>
       }
     >
-      <PanelGroup accordion defaultActiveKey={category.lines[0]?.id}>
+      <PanelGroup>
         {category.lines.map((line) => (
           <Panel
             key={`line-${line.id}`}
             eventKey={line.id}
+            collapsible
             header={
               <Stack direction="row" style={{ marginRight: "3%" }} spacing={12}>
                 <RenameButton
@@ -118,6 +137,17 @@ export const CategoryDetail = ({
                     onAdd(RESOURCE, line.id as number, category.mostlyConsumes);
                   }}
                 />
+                <IconButton
+                  icon={<Copy />}
+                  appearance="primary"
+                  color="cyan"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDuplicate(line);
+                  }}
+                >
+                  Copy
+                </IconButton>
                 <DeleteButton
                   text="Delete line"
                   onClick={(e) => {

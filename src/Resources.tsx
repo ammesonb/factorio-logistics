@@ -12,7 +12,7 @@ export const Resources = ({
   const [active, setActive] = useState("");
 
   return (
-    <Sidenav style={{ maxHeight: "80vh", overflowY: "scroll" }}>
+    <Sidenav>
       <Sidenav.Header style={{ padding: "5% 5% 0% 5%" }}>
         <h3>Resources</h3>
       </Sidenav.Header>

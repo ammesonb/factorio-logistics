@@ -28,6 +28,7 @@ import {
   CATEGORY,
   db,
   deleteEntry,
+  duplicateLine,
   ICategory,
   ILine,
   ISurface,
@@ -276,6 +277,7 @@ const App = () => {
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
+            onDuplicate={(line: Line) => duplicateLine(line, setError)}
             items={rawItems}
             itemsByID={itemsByID}
             toggleProduction={(type: string, id: number, enabled: boolean) =>
@@ -435,7 +437,7 @@ const App = () => {
         </Stack>
       </Header>
       <Container>
-        <Sidebar width={320}>
+        <Sidebar width={320} style={{ maxHeight: "80vh", overflowY: "scroll" }}>
           <Surfaces
             surfaces={surfaces}
             onPageChange={navigate}
@@ -443,7 +445,13 @@ const App = () => {
             onDelete={openDeleteDialog}
           />
         </Sidebar>
-        <Content style={{ padding: "0px 2% 0px 2%" }}>
+        <Content
+          style={{
+            padding: "0px 2% 0px 2%",
+            maxHeight: "80vh",
+            overflowY: "scroll",
+          }}
+        >
           {error !== "" && (
             <Message type="error" style={{ marginBottom: "3%" }}>
               <Stack direction="row">
@@ -501,7 +509,7 @@ const App = () => {
           />
           {pageBody}
         </Content>
-        <Sidebar>
+        <Sidebar style={{ maxHeight: "80vh", overflowY: "scroll" }}>
           <Resources items={itemsSeen} onPageChange={navigate} />
         </Sidebar>
       </Container>
