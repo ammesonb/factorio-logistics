@@ -68,7 +68,10 @@ export const ResourceRow = ({
       <h6>Quantity</h6>
       <Stack.Item basis="120px">
         <InputNumber
-          defaultValue={resource.quantityPerSec * timeUnit}
+          defaultValue={(resource.quantityPerSec * timeUnit).toLocaleString(
+            undefined,
+            { maximumFractionDigits: 3 },
+          )}
           onBlur={(e: FocusEvent<HTMLInputElement>) =>
             updateQuantity(
               resource.id as number,

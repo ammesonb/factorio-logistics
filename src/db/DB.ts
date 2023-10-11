@@ -32,6 +32,7 @@ export interface ILine {
   categoryID: number;
   name: string;
   enabled: boolean;
+  factoryPlannerLine?: string;
 }
 
 export interface Resource {
@@ -88,6 +89,7 @@ export interface Line {
   name: string;
   resources: Resource[];
   enabled: boolean;
+  factoryPlannerLine?: string;
 }
 
 export const parseDBData = (
@@ -297,6 +299,16 @@ const toggleLine = (
   db.lines
     .update(lineID, { enabled })
     .catch((e) => onError(`Failed to toggle line: ${e}`));
+};
+
+export const setFPOnLine = (
+  lineID: number,
+  fpLine: string,
+  onError: (e: string) => void,
+) => {
+  db.lines
+    .update(lineID, { factoryPlannerLine: fpLine })
+    .catch((e) => onError(`Failed to set FP line: ${e}`));
 };
 
 export const updateCategoryConsumes = (

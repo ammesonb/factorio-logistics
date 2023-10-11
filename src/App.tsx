@@ -39,6 +39,7 @@ import {
   renameEntry,
   RESOURCE,
   Resource,
+  setFPOnLine,
   SURFACE,
   Surface,
   toggleProduction,
@@ -48,6 +49,7 @@ import {
   updateResourceQuantity,
 } from "./db/DB";
 import { DeleteModal } from "./DeleteModal";
+import { FactoryPlannerModal } from "./FactoryPlannerModal";
 import { ImportExportModal } from "./ImportExportModal";
 import { ItemDetail } from "./ItemDetail";
 import { LineDetail } from "./LineDetail";
@@ -66,6 +68,9 @@ interface History {
 const App = () => {
   const [error, setError] = useState("");
   const [dataLoaded, setDataLoaded] = useState<boolean>(false);
+
+  const [impExpMode, setImpExpMode] = useState("");
+  const [fpLineOpen, setFPLine] = useState<number | null>(null);
 
   const [itemsByID, setItems] = useState<{ [key: string]: Item }>({});
   const rawItems: Item[] = useLiveQuery(
@@ -278,6 +283,7 @@ const App = () => {
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
             onDuplicate={(line: Line) => duplicateLine(line, setError)}
+            setFPLine={setFPLine}
             items={rawItems}
             itemsByID={itemsByID}
             toggleProduction={(type: string, id: number, enabled: boolean) =>
@@ -379,8 +385,6 @@ const App = () => {
     openDeleteDialog,
   ]);
 
-  const [impExpMode, setImpExpMode] = useState("");
-
   return dataLoaded ? (
     <Container>
       <Header style={{ marginBottom: "1%" }}>
@@ -412,6 +416,16 @@ const App = () => {
               onChange={(unit) => setTimeUnit(unit)}
             />
           </Stack.Item>
+          {currentPage.type === LINE && <Stack.Item grow={1} />}
+          {currentPage.type === LINE && (
+            <Button
+              appearance="primary"
+              color="orange"
+              onClick={() => setFPLine(currentPage.id as number)}
+            >
+              Get/set FP
+            </Button>
+          )}
           <Stack.Item grow={3} />
           <Button
             appearance="primary"
@@ -506,6 +520,14 @@ const App = () => {
             open={impExpMode.length > 0}
             onClose={() => setImpExpMode("")}
             isExporting={impExpMode === "Export"}
+          />
+          <FactoryPlannerModal
+            open={fpLineOpen !== null}
+            onClose={() => setFPLine(null)}
+            setFPForLine={(fpLine) =>
+              setFPOnLine(fpLineOpen as number, fpLine, setError)
+            }
+            line={linesByID[fpLineOpen as number]}
           />
           {pageBody}
         </Content>

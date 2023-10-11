@@ -1,5 +1,6 @@
 import { AdvancedAnalytics, Copy, PageNext, TableColumn } from "@rsuite/icons";
 import {
+  Button,
   Divider,
   IconButton,
   List,
@@ -31,6 +32,7 @@ export const CategoryDetail = ({
   onRename,
   onDelete,
   onDuplicate,
+  setFPLine,
   items,
   itemsByID,
   toggleProduction,
@@ -46,6 +48,7 @@ export const CategoryDetail = ({
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
   onDuplicate: (line: Line) => void;
+  setFPLine: (lineID: number) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
   toggleProduction: (type: string, id: number, enabled: boolean) => void;
@@ -148,6 +151,16 @@ export const CategoryDetail = ({
                 >
                   Copy
                 </IconButton>
+                <Button
+                  appearance="primary"
+                  color="orange"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFPLine(line.id as number);
+                  }}
+                >
+                  FP
+                </Button>
                 <DeleteButton
                   text="Delete line"
                   onClick={(e) => {
