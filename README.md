@@ -1,6 +1,6 @@
 # factorio-logistics
 This tool aims to supplement in-game mods like Factory Planner and Helmod.
-While those tools excel in managing resource inputs/outputs, factory efficiency and counts, and other production-related attributes, they do not provide holistic logistic views for resource and production chains.
+While those tools excel in managing resource inputs/outputs, factory efficiency and counts, and other production-related attributes, at megabase scales they do not provide holistic logistic views for resource and production chains.
 
 The website built by Factorio Logistics provides the following benefits:
 - A global resource summary across all lines, allowing for easy viewing of under-utilized or over-taxed resources
