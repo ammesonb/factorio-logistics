@@ -1,11 +1,22 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ZipPlugin = require("zip-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = {
   entry: "./src/index.tsx",
   plugins: [
+    new CompressionPlugin(),
     new HtmlWebpackPlugin({
       template: "public/index.html",
+    }),
+    new ZipPlugin({
+      path: "../",
+      filename: "build.zip",
+
+      // OPTIONAL: defaults to including everything
+      // can be a string, a RegExp, or an array of strings and RegExps
+      include: ["index.html", /\.js$/],
     }),
   ],
   module: {

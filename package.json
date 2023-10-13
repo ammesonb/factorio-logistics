@@ -21,6 +21,7 @@
     "@types/react-dom": "^18.2.8",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
+    "compression-webpack-plugin": "^10.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
     "eslint": "^8.50.0",
@@ -34,7 +35,8 @@
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
-    "webpack-merge": "^5.9.0"
+    "webpack-merge": "^5.9.0",
+    "zip-webpack-plugin": "^4.0.1"
   },
   "dependencies": {
     "@rsuite/icons": "^1.0.3",
