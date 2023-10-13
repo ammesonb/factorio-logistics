@@ -8,4 +8,4 @@ The website built by Factorio Logistics provides the following benefits:
 - Nested organization of production lines, for easier management
 - Supports ***any and all mods*** by using data from the built-in Factorio export feature
 
-For further information, please see the GitHub wiki.
+For further information, please see the [GitHub wiki](../../wiki).
