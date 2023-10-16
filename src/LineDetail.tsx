@@ -1,4 +1,4 @@
-import { AdvancedAnalytics, PageNext } from "@rsuite/icons";
+import { PageNext } from "@rsuite/icons";
 import { Divider, List, Panel, Stack } from "rsuite";
 import {
   CATEGORY,
@@ -36,7 +36,7 @@ export const LineDetail = ({
   onAdd: (
     type: string,
     parent: string | number,
-    categoryConsumes: boolean,
+    categoryConsumes?: boolean,
   ) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
@@ -79,17 +79,8 @@ export const LineDetail = ({
             enabled={line.enabled}
             toggleProduction={toggleProduction}
           />
-          <AddButton
-            icon={AdvancedAnalytics}
-            text="Add resource"
-            onClick={() =>
-              onAdd(RESOURCE, line.id as number, category.mostlyConsumes)
-            }
-          />
-          <DeleteButton
-            text="Delete line"
-            onClick={() => onDelete(LINE, line.id as number, line.name)}
-          />
+          <AddButton type={RESOURCE} parent={line.id as number} onAdd={onAdd} />
+          <DeleteButton type={LINE} entity={line} onDelete={onDelete} />
         </Stack>
         <Divider />
       </>

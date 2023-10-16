@@ -1,4 +1,3 @@
-import { Table, TableColumn } from "@rsuite/icons";
 import { Divider, List, Panel, PanelGroup, Stack } from "rsuite";
 import { CATEGORY, LINE, SURFACE, Surface } from "./db/DB";
 import { AddButton } from "./wrappers/AddButton";
@@ -33,15 +32,8 @@ export const SurfaceDetail = ({
             />
             <h3>{surface.name}</h3>
             <Stack.Item grow={1} />
-            <AddButton
-              icon={Table}
-              text="Add category"
-              onClick={() => onAdd(CATEGORY, surface.name)}
-            />
-            <DeleteButton
-              text="Delete surface"
-              onClick={() => onDelete(SURFACE, surface.name, surface.name)}
-            />
+            <AddButton type={CATEGORY} parent={surface.name} onAdd={onAdd} />
+            <DeleteButton type={SURFACE} entity={surface} onDelete={onDelete} />
           </Stack>
           <Divider />
         </>
@@ -69,19 +61,14 @@ export const SurfaceDetail = ({
                   toggleProduction={toggleProduction}
                 />
                 <AddButton
-                  icon={TableColumn}
-                  text="Add line"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAdd(LINE, category.id as number);
-                  }}
+                  type={LINE}
+                  parent={category.id as number}
+                  onAdd={onAdd}
                 />
                 <DeleteButton
-                  text="Delete category"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(CATEGORY, category.id as number, category.name);
-                  }}
+                  type={CATEGORY}
+                  entity={category}
+                  onDelete={onDelete}
                 />
                 <ViewButton
                   onClick={() => onPageChange(CATEGORY, category.id as number)}
@@ -117,10 +104,9 @@ export const SurfaceDetail = ({
                         />
                       </span>
                       <DeleteButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(LINE, line.id as number, line.name);
-                        }}
+                        type={LINE}
+                        entity={line}
+                        onDelete={onDelete}
                       />
                     </Stack>
                   </List.Item>

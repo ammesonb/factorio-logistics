@@ -1,22 +1,43 @@
-import Icon, { IconProps } from "@rsuite/icons/lib/Icon";
-import { ForwardRefExoticComponent } from "react";
+import { AdvancedAnalytics, Global, Table, TableColumn } from "@rsuite/icons";
 import { IconButton } from "rsuite";
+import { CATEGORY, LINE, SURFACE } from "../db/DB";
 
 export const AddButton = ({
-  icon,
-  text,
-  onClick,
+  type,
+  parent,
+  showText,
+  onAdd,
+  mostlyConsumes,
 }: {
-  icon: ForwardRefExoticComponent<IconProps>;
-  text?: string;
-  onClick: (e: React.MouseEvent<HTMLElement>) => void;
+  type: string;
+  parent: string | number;
+  showText?: boolean;
+  onAdd: (
+    type: string,
+    parent: string | number,
+    mostlyConsumes?: boolean,
+  ) => void;
+  mostlyConsumes?: boolean;
 }) => (
   <IconButton
     appearance="primary"
     color="green"
-    icon={<Icon as={icon} />}
-    onClick={onClick}
+    icon={
+      type === SURFACE ? (
+        <Global />
+      ) : type === CATEGORY ? (
+        <Table />
+      ) : type === LINE ? (
+        <TableColumn />
+      ) : (
+        <AdvancedAnalytics />
+      )
+    }
+    onClick={(e) => {
+      e.stopPropagation();
+      onAdd(type, parent, mostlyConsumes);
+    }}
   >
-    {text}
+    {showText === false ? undefined : `Add ${type.toLowerCase()}`}
   </IconButton>
 );

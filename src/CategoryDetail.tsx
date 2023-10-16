@@ -1,14 +1,5 @@
-import { AdvancedAnalytics, Copy, PageNext, TableColumn } from "@rsuite/icons";
-import {
-  Button,
-  Divider,
-  IconButton,
-  List,
-  Panel,
-  PanelGroup,
-  Stack,
-  Toggle,
-} from "rsuite";
+import { PageNext } from "@rsuite/icons";
+import { Divider, List, Panel, PanelGroup, Stack, Toggle } from "rsuite";
 import {
   CATEGORY,
   LINE,
@@ -19,6 +10,7 @@ import {
   Line,
 } from "./db/DB";
 import { ResourceRow } from "./ResourceRow";
+import { ActionsMenu } from "./wrappers/ActionsMenu";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
 import { ProductionToggle } from "./wrappers/ProductionToggle";
@@ -98,15 +90,14 @@ export const CategoryDetail = ({
               toggleProduction={toggleProduction}
             />
             <AddButton
-              icon={TableColumn}
-              text="Add line"
-              onClick={() => onAdd(LINE, category.id as number)}
+              type={LINE}
+              parent={category.id as number}
+              onAdd={onAdd}
             />
             <DeleteButton
-              text="Delete category"
-              onClick={() =>
-                onDelete(CATEGORY, category.id as number, category.name)
-              }
+              type={CATEGORY}
+              entity={category}
+              onDelete={onDelete}
             />
           </Stack>
           <Divider />
@@ -133,40 +124,16 @@ export const CategoryDetail = ({
                   toggleProduction={toggleProduction}
                 />
                 <AddButton
-                  icon={AdvancedAnalytics}
-                  text="Add resource"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAdd(RESOURCE, line.id as number, category.mostlyConsumes);
-                  }}
+                  type={RESOURCE}
+                  parent={line.id as number}
+                  onAdd={onAdd}
                 />
-                <IconButton
-                  icon={<Copy />}
-                  appearance="primary"
-                  color="cyan"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDuplicate(line);
-                  }}
-                >
-                  Copy
-                </IconButton>
-                <Button
-                  appearance="primary"
-                  color="orange"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setFPLine(line.id as number);
-                  }}
-                >
-                  FP
-                </Button>
-                <DeleteButton
-                  text="Delete line"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(LINE, line.id as number, line.name);
-                  }}
+                <ActionsMenu
+                  type={LINE}
+                  line={line}
+                  setFPLine={setFPLine}
+                  onDuplicate={onDuplicate}
+                  onDelete={onDelete}
                 />
                 <ViewButton
                   onClick={() => onPageChange(LINE, line.id as number)}

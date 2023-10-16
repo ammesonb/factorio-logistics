@@ -68,10 +68,7 @@ export const ResourceRow = ({
       <h6>Quantity</h6>
       <Stack.Item basis="120px">
         <InputNumber
-          defaultValue={(resource.quantityPerSec * timeUnit).toLocaleString(
-            undefined,
-            { maximumFractionDigits: 3 },
-          )}
+          defaultValue={resource.quantityPerSec * timeUnit}
           onBlur={(e: FocusEvent<HTMLInputElement>) =>
             updateQuantity(
               resource.id as number,
@@ -98,13 +95,10 @@ export const ResourceRow = ({
       />
       <Stack.Item grow={4} />
       <DeleteButton
-        onClick={() =>
-          onDelete(
-            RESOURCE,
-            resource.id as number,
-            itemsByID[resource.item].name,
-          )
-        }
+        type={RESOURCE}
+        entity={resource}
+        onDelete={onDelete}
+        name={itemsByID[resource.item].name}
       />
     </Stack>
   );

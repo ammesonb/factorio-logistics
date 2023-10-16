@@ -182,18 +182,17 @@ const generateButtons = (
       <Stack.Item grow={1} />
       {HIERARCHY[type] && (
         <AddButton
-          icon={HIERARCHY[type].childIcon}
-          onClick={(e) => {
-            e.stopPropagation();
-            onAdd(HIERARCHY[type].child, id);
-          }}
+          type={HIERARCHY[type].child}
+          parent={id}
+          onAdd={onAdd}
+          showText={false}
         />
       )}
       <DeleteButton
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete(type, id, obj.name);
-        }}
+        showText={false}
+        type={type}
+        entity={obj}
+        onDelete={onDelete}
       />
     </Stack>
   );
@@ -225,11 +224,7 @@ export const Surfaces = ({
             <h3>Surfaces</h3>
           </Stack.Item>
           <Stack.Item>
-            <AddButton
-              text="Add"
-              icon={Global}
-              onClick={() => onAdd(SURFACE, "")}
-            />
+            <AddButton type={SURFACE} parent="" onAdd={onAdd} />
           </Stack.Item>
         </Stack>
       </Sidenav.Header>
