@@ -1,5 +1,6 @@
 import { Divider, List, Panel, PanelGroup, Stack } from "rsuite";
-import { CATEGORY, LINE, SURFACE, Surface } from "./db/DB";
+import { Category, CATEGORY, Line, LINE, SURFACE, Surface } from "./db/DB";
+import { ActionsMenu } from "./wrappers/ActionsMenu";
 import { AddButton } from "./wrappers/AddButton";
 import { DeleteButton } from "./wrappers/DeleteButton";
 import { ProductionToggle } from "./wrappers/ProductionToggle";
@@ -10,6 +11,7 @@ export const SurfaceDetail = ({
   surface,
   onAdd,
   onRename,
+  onDuplicate,
   onDelete,
   toggleProduction,
   onPageChange,
@@ -17,6 +19,7 @@ export const SurfaceDetail = ({
   surface: Surface;
   onAdd: (type: string, parent: string | number) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
+  onDuplicate: (type: string, entity: Category | Line) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
   toggleProduction: (type: string, id: number, enabled: boolean) => void;
   onPageChange: (pageType: string, pageID: string | number) => void;
@@ -65,9 +68,10 @@ export const SurfaceDetail = ({
                   parent={category.id as number}
                   onAdd={onAdd}
                 />
-                <DeleteButton
+                <ActionsMenu
                   type={CATEGORY}
-                  entity={category}
+                  category={category}
+                  onDuplicate={onDuplicate}
                   onDelete={onDelete}
                 />
                 <ViewButton

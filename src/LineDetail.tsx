@@ -79,7 +79,13 @@ export const LineDetail = ({
             enabled={line.enabled}
             toggleProduction={toggleProduction}
           />
-          <AddButton type={RESOURCE} parent={line.id as number} onAdd={onAdd} />
+          <AddButton
+            type={RESOURCE}
+            parent={line.id as number}
+            onAdd={(type, parent) =>
+              onAdd(type, parent, category.mostlyConsumes)
+            }
+          />
           <DeleteButton type={LINE} entity={line} onDelete={onDelete} />
         </Stack>
         <Divider />

@@ -28,7 +28,7 @@ import {
   CATEGORY,
   db,
   deleteEntry,
-  duplicateLine,
+  duplicate,
   ICategory,
   ILine,
   ISurface,
@@ -264,6 +264,7 @@ const App = () => {
             surface={entity[0] as Surface}
             onAdd={openAddDialog}
             onRename={openRenameDialog}
+            onDuplicate={(type, entity) => duplicate(type, entity, setError)}
             onDelete={openDeleteDialog}
             toggleProduction={(type: string, id: number, enabled: boolean) =>
               toggleProduction(type, id, enabled, setError)
@@ -282,7 +283,9 @@ const App = () => {
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDelete={openDeleteDialog}
-            onDuplicate={(line: Line) => duplicateLine(line, setError)}
+            onDuplicate={(type: string, entity: Line | Category) =>
+              duplicate(type, entity, setError)
+            }
             setFPLine={setFPLine}
             items={rawItems}
             itemsByID={itemsByID}

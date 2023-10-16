@@ -1,13 +1,13 @@
 import { Copy } from "@rsuite/icons";
 import { IconButton } from "rsuite";
-import { Line } from "../db/DB";
+import { Category, Line } from "../db/DB";
 
 export const CopyButton = ({
   onDuplicate,
-  line,
+  entity,
 }: {
-  onDuplicate: (line: Line) => void;
-  line: Line;
+  onDuplicate: (entity: Line | Category) => void;
+  entity: Line | Category;
 }) => (
   <IconButton
     appearance="primary"
@@ -15,7 +15,7 @@ export const CopyButton = ({
     icon={<Copy />}
     onClick={(e) => {
       e.stopPropagation();
-      onDuplicate(line);
+      onDuplicate(entity);
     }}
   >
     Copy

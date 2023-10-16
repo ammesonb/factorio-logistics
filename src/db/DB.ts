@@ -246,6 +246,54 @@ export const add = (
 
 export const addSurface = (name: string) => db.surfaces.add({ name });
 
+export const move = (
+  type: string,
+  id: number,
+  newParent: string | number,
+  onError: (e: string) => void,
+) => {
+  if (type === CATEGORY) {
+    db.categories
+      .update(id, { surface: newParent as string })
+      .catch((e) => onError(`Failed to move category: ${e}}`));
+  } else if (type === LINE) {
+    db.lines
+      .update(id, { categoryID: newParent as number })
+      .catch((e) => onError(`Failed to move category: ${e}}`));
+  }
+};
+
+export const duplicate = (
+  type: string,
+  entity: Line | Category,
+  onError: (e: string) => void,
+) => {
+  if (type === CATEGORY) {
+    duplicateCategory(entity as Category, onError);
+  } else if (type === LINE) {
+    duplicateLine(entity as Line, onError);
+  }
+};
+
+export const duplicateCategory = (
+  category: Category,
+  onError: (e: string) => void,
+) => {
+  delete category.id;
+
+  db.transaction("rw", db.categories, db.lines, db.resources, async () => {
+    db.categories
+      .add(category)
+      .then((categoryID) => {
+        category.lines.forEach((l) => {
+          const line = { ...l, categoryID: categoryID as number };
+          duplicateLine(line, onError);
+        });
+      })
+      .catch((e) => onError(`Failed to copy category: ${e}`));
+  });
+};
+
 export const duplicateLine = (line: Line, onError: (e: string) => void) => {
   delete line.id;
 

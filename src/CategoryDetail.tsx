@@ -39,7 +39,7 @@ export const CategoryDetail = ({
   onAdd: (type: string, parent: string | number, consumed?: boolean) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
-  onDuplicate: (line: Line) => void;
+  onDuplicate: (type: string, entity: Line | Category) => void;
   setFPLine: (lineID: number) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
@@ -126,7 +126,9 @@ export const CategoryDetail = ({
                 <AddButton
                   type={RESOURCE}
                   parent={line.id as number}
-                  onAdd={onAdd}
+                  onAdd={(type, parent) =>
+                    onAdd(type, parent, category.mostlyConsumes)
+                  }
                 />
                 <ActionsMenu
                   type={LINE}
