@@ -24,6 +24,7 @@ export const CategoryDetail = ({
   onRename,
   onDelete,
   onDuplicate,
+  onMove,
   setFPLine,
   items,
   itemsByID,
@@ -40,6 +41,7 @@ export const CategoryDetail = ({
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
   onDuplicate: (type: string, entity: Line | Category) => void;
+  onMove: (type: string, id: number, name: string) => void;
   setFPLine: (lineID: number) => void;
   items: Item[];
   itemsByID: { [key: string]: Item };
@@ -135,6 +137,7 @@ export const CategoryDetail = ({
                   line={line}
                   setFPLine={setFPLine}
                   onDuplicate={onDuplicate}
+                  onMove={onMove}
                   onDelete={onDelete}
                 />
                 <ViewButton

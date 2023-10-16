@@ -12,6 +12,7 @@ export const SurfaceDetail = ({
   onAdd,
   onRename,
   onDuplicate,
+  onMove,
   onDelete,
   toggleProduction,
   onPageChange,
@@ -20,6 +21,7 @@ export const SurfaceDetail = ({
   onAdd: (type: string, parent: string | number) => void;
   onRename: (type: string, id: string | number, currentName: string) => void;
   onDuplicate: (type: string, entity: Category | Line) => void;
+  onMove: (type: string, id: number, name: string) => void;
   onDelete: (type: string, id: string | number, name: string) => void;
   toggleProduction: (type: string, id: number, enabled: boolean) => void;
   onPageChange: (pageType: string, pageID: string | number) => void;
@@ -72,6 +74,7 @@ export const SurfaceDetail = ({
                   type={CATEGORY}
                   category={category}
                   onDuplicate={onDuplicate}
+                  onMove={onMove}
                   onDelete={onDelete}
                 />
                 <ViewButton

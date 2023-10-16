@@ -116,12 +116,17 @@ export const parseDBData = (
 
   rawLines.forEach((dbLine) => {
     const line = { ...dbLine, resources: [] };
-    categoriesByID[line.categoryID].lines.push(line);
-    linesByID[line?.id as number] = line;
+    if (categoriesByID[line.categoryID]) {
+      categoriesByID[line.categoryID].lines.push(line);
+      linesByID[line?.id as number] = line;
+    }
   });
 
   rawResources.forEach((dbRes) => {
-    linesByID[dbRes.lineID].resources.push(dbRes);
+    // Need to gate this since when copying, can result in race conditions
+    if (linesByID[dbRes.lineID]) {
+      linesByID[dbRes.lineID].resources.push(dbRes);
+    }
   });
 
   s.forEach((surface: Surface) => {
@@ -171,7 +176,7 @@ export const analyzeResourceUsage = (
     resourceProductionRates[resource.item] =
       (resourceProductionRates[resource.item] ?? 0) +
       // Only add resource for production if the line is enabled
-      (linesByID[resource.lineID].enabled
+      (linesByID[resource.lineID]?.enabled
         ? (resource.isConsumed ? -1 : 1) * resource.quantityPerSec
         : 0);
 
@@ -181,11 +186,11 @@ export const analyzeResourceUsage = (
       !linesByResource[resource.item] ||
       !linesByResource[resource.item]
         .map((l) => l.id)
-        .includes(linesByID[resource.lineID].id)
+        .includes(linesByID[resource.lineID]?.id)
     ) {
       linesByResource[resource.item] = [
         ...(linesByResource?.[resource.item] || []),
-        linesByID[resource.lineID],
+        ...(linesByID[resource.lineID] ? [linesByID[resource.lineID]] : []),
       ];
     }
   });
@@ -250,6 +255,7 @@ export const move = (
   type: string,
   id: number,
   newParent: string | number,
+  onComplete: () => void,
   onError: (e: string) => void,
 ) => {
   if (type === CATEGORY) {
@@ -261,6 +267,8 @@ export const move = (
       .update(id, { categoryID: newParent as number })
       .catch((e) => onError(`Failed to move category: ${e}}`));
   }
+
+  onComplete();
 };
 
 export const duplicate = (
@@ -300,7 +308,7 @@ export const duplicateLine = (line: Line, onError: (e: string) => void) => {
   db.lines
     .add(line)
     .then((lineID) => {
-      const rs = line.resources.map((r) => {
+      const rs = line?.resources?.map((r) => {
         const resource = { ...r, lineID: lineID as number };
         delete resource.id;
         return resource;

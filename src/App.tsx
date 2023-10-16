@@ -35,6 +35,7 @@ import {
   Item,
   Line,
   LINE,
+  move,
   parseDBData,
   renameEntry,
   RESOURCE,
@@ -53,6 +54,7 @@ import { FactoryPlannerModal } from "./FactoryPlannerModal";
 import { ImportExportModal } from "./ImportExportModal";
 import { ItemDetail } from "./ItemDetail";
 import { LineDetail } from "./LineDetail";
+import { MoveModal } from "./MoveModal";
 import { RenameModal } from "./RenameModal";
 import { Resources } from "./Resources";
 import { SurfaceDetail } from "./SurfaceDetail";
@@ -184,6 +186,34 @@ const App = () => {
     [setRenameID, setRenameType, setRenameName],
   );
 
+  const [moveType, setMoveType] = useState("");
+  const [moveID, setMoveID] = useState(0);
+  const [moveName, setMoveName] = useState("");
+
+  const moveOptions = useMemo(() => {
+    const options =
+      moveType === CATEGORY
+        ? surfaces.map((s) => ({ label: s.name, value: s.name }))
+        : Object.keys(categoriesByID).map((cID: string) => ({
+            label: `${categoriesByID[parseInt(cID, 10)].surface} > ${
+              categoriesByID[parseInt(cID, 10)].name
+            }`,
+            value: parseInt(cID, 10),
+          }));
+
+    options.sort((a, b) => (a.label > b.label ? 1 : -1));
+    return options;
+  }, [moveType, moveID]);
+
+  const openMoveDialog = useMemo(
+    () => (type: string, id: number, name: string) => {
+      setMoveType(type);
+      setMoveID(id);
+      setMoveName(name);
+    },
+    [setMoveType, setMoveID, setMoveName],
+  );
+
   const [deleteType, setDeleteType] = useState("");
   const [deleteID, setDeleteID] = useState<string | number>("");
   const [deleteName, setDeleteName] = useState("");
@@ -265,6 +295,7 @@ const App = () => {
             onAdd={openAddDialog}
             onRename={openRenameDialog}
             onDuplicate={(type, entity) => duplicate(type, entity, setError)}
+            onMove={openMoveDialog}
             onDelete={openDeleteDialog}
             toggleProduction={(type: string, id: number, enabled: boolean) =>
               toggleProduction(type, id, enabled, setError)
@@ -286,6 +317,7 @@ const App = () => {
             onDuplicate={(type: string, entity: Line | Category) =>
               duplicate(type, entity, setError)
             }
+            onMove={openMoveDialog}
             setFPLine={setFPLine}
             items={rawItems}
             itemsByID={itemsByID}
@@ -507,6 +539,20 @@ const App = () => {
               onComplete: () => void,
             ) => renameEntry(type, id, name, onComplete, setError)}
             onClose={() => setRenameType("")}
+          />
+          <MoveModal
+            type={moveType}
+            id={moveID}
+            name={moveName}
+            onMove={(type, id, newParent, onComplete) =>
+              move(type, id, newParent, onComplete, setError)
+            }
+            onClose={() => {
+              setMoveType("");
+              setMoveID(0);
+              setMoveName("");
+            }}
+            options={moveOptions}
           />
           <DeleteModal
             type={deleteType}
