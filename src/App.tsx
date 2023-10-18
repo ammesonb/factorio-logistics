@@ -68,6 +68,15 @@ interface History {
 }
 
 const App = () => {
+  useEffect(
+    () =>
+      window.addEventListener("beforeunload", (e) => {
+        e.preventDefault();
+        e.returnValue = "";
+      }),
+    [],
+  );
+
   const [error, setError] = useState("");
   const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
@@ -448,7 +457,12 @@ const App = () => {
                 { label: "Day", value: 86400 },
               ]}
               value={timeUnit}
-              onChange={(unit) => setTimeUnit(unit)}
+              onChange={(unit) => {
+                if (unit) {
+                  setTimeUnit(unit);
+                }
+              }}
+              cleanable={false}
             />
           </Stack.Item>
           {currentPage.type === LINE && <Stack.Item grow={1} />}
