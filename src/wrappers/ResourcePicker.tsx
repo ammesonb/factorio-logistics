@@ -48,7 +48,11 @@ export const ResourcePicker = ({
           {label}
         </>
       )}
-      onChange={onChange}
+      onChange={(value) => {
+        if (value && value.length > 0) {
+          onChange(value);
+        }
+      }}
       virtualized
       disabled={enabled === false}
       autoFocus={autoFocus ?? false}
