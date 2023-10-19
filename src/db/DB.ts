@@ -158,7 +158,10 @@ export const memoizeLines = (lines: ILine[]): { [key: number]: ILine } => {
 export const analyzeResourceUsage = (
   rawResources: Resource[],
   itemsByID: { [key: string]: Item },
+  categoriesByID: { [key: number]: Category },
   linesByID: { [key: number]: Line },
+  usageSurface: string | null,
+  usageCategory: number | null,
 ): {
   resourceProductionRates: { [key: string]: number };
   itemsSeen: Item[];
@@ -176,7 +179,12 @@ export const analyzeResourceUsage = (
     resourceProductionRates[resource.item] =
       (resourceProductionRates[resource.item] ?? 0) +
       // Only add resource for production if the line is enabled
-      (linesByID[resource.lineID]?.enabled
+      (linesByID[resource.lineID]?.enabled &&
+      (!usageSurface ||
+        usageSurface ===
+          categoriesByID[linesByID[resource.lineID].categoryID].surface) &&
+      (!usageCategory ||
+        linesByID[resource.lineID].categoryID === usageCategory)
         ? (resource.isConsumed ? -1 : 1) * resource.quantityPerSec
         : 0);
 

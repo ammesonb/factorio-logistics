@@ -162,9 +162,27 @@ const App = () => {
     return byID;
   }, [surfaces]);
 
+  const [usageSurface, setUsageSurface] = useState<string | null>(null);
+  const [usageCategory, setUsageCategory] = useState<number | null>(null);
+
   const { resourceProductionRates, itemsSeen, linesByResource } = useMemo(
-    () => analyzeResourceUsage(rawResources, itemsByID, linesByID),
-    [rawResources, itemsByID, linesByID],
+    () =>
+      analyzeResourceUsage(
+        rawResources,
+        itemsByID,
+        categoriesByID,
+        linesByID,
+        usageSurface,
+        usageCategory,
+      ),
+    [
+      rawResources,
+      itemsByID,
+      categoriesByID,
+      linesByID,
+      usageSurface,
+      usageCategory,
+    ],
   );
 
   const [addType, setAddType] = useState("");
@@ -604,6 +622,12 @@ const App = () => {
           timeUnit={timeUnit}
           itemsByID={itemsByID}
           onPageChange={navigate}
+          surfaces={surfaces}
+          categories={Object.values(categoriesByID)}
+          usageSurface={usageSurface}
+          usageCategory={usageCategory}
+          setUsageSurface={setUsageSurface}
+          setUsageCategory={setUsageCategory}
         />
       </Footer>
     </Container>
